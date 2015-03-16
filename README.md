@@ -2,7 +2,8 @@
 
 Revit add-in demonstrating use of SpatialElementGeometryCalculator to determine net and gross wall area per room.
 
-For a detailed desciption, please refer to
+For a detailed desciption, please refer to the original Revit API discussion thread on
+[Door/Window Areas](http://forums.autodesk.com/t5/revit-api/door-window-areas/td-p/5535565) and
 [The Building Coder](http://thebuildingcoder.typepad.com).
 
 
