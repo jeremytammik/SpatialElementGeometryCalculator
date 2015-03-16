@@ -6,8 +6,9 @@ For a detailed desciption, please refer to
 [The Building Coder](http://thebuildingcoder.typepad.com).
 
 
-## Author
+## Authors
 
+Phillip Miller, [Kiwi Codes Solutions Ltd.](http://www.kiwicodes.com) and
 Jeremy Tammik, [The Building Coder](http://thebuildingcoder.typepad.com), Autodesk Inc.
 
 
