@@ -15,11 +15,12 @@ namespace SpatialElementGeometryCalculator
   public class Command : IExternalCommand
   {
     /// <summary>
-    /// Convert square feet to square meters with two decimal places precision.
+    /// Convert square feet to square meters 
+    /// with two decimal places precision.
     /// </summary>
     double sqFootToSquareM( double sqFoot )
     {
-      return Math.Round( (double) ( sqFoot * 0.092903 ), 2 );
+      return Math.Round( sqFoot * 0.092903, 2 );
     }
 
     /// <summary>
@@ -58,6 +59,7 @@ namespace SpatialElementGeometryCalculator
         // The family instances hosted by this wall
         // could be filtered out more efficiently using 
         // a filtered element collector parameter filter.
+        // This would be important in a large model.
 
         if( fi.get_Parameter( 
           BuiltInParameter.HOST_ID_PARAM )
@@ -184,7 +186,7 @@ namespace SpatialElementGeometryCalculator
                         BuiltInParameter.ALL_MODEL_MARK )
                           .AsString() 
                       + " : Area " + netArea.ToString() 
-                      + "m2\r\n";
+                      + " m2\r\n";
                   }
                 }
               }
