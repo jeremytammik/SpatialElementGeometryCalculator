@@ -15,18 +15,29 @@ namespace SpatialElementGeometryCalculator
   [Transaction( TransactionMode.Manual )]
   public class Command : IExternalCommand
   {
-    private double sqFootToSquareM( double sqFoot )
+    /// <summary>
+    /// Convert square feet to square meters with two decimal places precision.
+    /// </summary>
+    double sqFootToSquareM( double sqFoot )
     {
       return Math.Round( (double) ( sqFoot * 0.092903 ), 2 );
     }
 
-    private double calwallAreaMinusOpenings( double subfaceArea, Element ele, Document doc, Room room )
+    /// <summary>
+    /// Calculate wall area minus openings
+    /// </summary>
+    /// <param name="subfaceArea">Initial gross subface area</param>
+    /// <param name="wall"></param>
+    /// <param name="doc"></param>
+    /// <param name="room"></param>
+    /// <returns></returns>
+    double calwallAreaMinusOpenings( double subfaceArea, Element wall, Document doc, Room room )
     {
       FilteredElementCollector fiCol = new FilteredElementCollector( doc ).OfClass( typeof( FamilyInstance ) );
       List<ElementId> lstTotempDel = new List<ElementId>();
       foreach( FamilyInstance fi in fiCol )
       {
-        if( fi.get_Parameter( BuiltInParameter.HOST_ID_PARAM ).AsValueString() == ele.Id.ToString() )
+        if( fi.get_Parameter( BuiltInParameter.HOST_ID_PARAM ).AsValueString() == wall.Id.ToString() )
         {
           if( ( fi.Room != null ) && ( fi.Room.Id == room.Id ) )
           {
@@ -45,18 +56,17 @@ namespace SpatialElementGeometryCalculator
       if( lstTotempDel.Count > 0 )
       {
         Transaction t = new Transaction( doc, "tmp Delete" );
-        double wallnetArea = ele.get_Parameter( BuiltInParameter.HOST_AREA_COMPUTED ).AsDouble();
+        double wallnetArea = wall.get_Parameter( BuiltInParameter.HOST_AREA_COMPUTED ).AsDouble();
         t.Start();
         doc.Delete( lstTotempDel );
         doc.Regenerate();
-        double wallGrossArea = ele.get_Parameter( BuiltInParameter.HOST_AREA_COMPUTED ).AsDouble();
+        double wallGrossArea = wall.get_Parameter( BuiltInParameter.HOST_AREA_COMPUTED ).AsDouble();
         t.RollBack();
         double fiArea = wallGrossArea - wallnetArea;
         return ( subfaceArea - fiArea );
       }
       return subfaceArea;
     }
-
 
     public Result Execute( ExternalCommandData commandData, ref string message, ElementSet elements )
     {
@@ -86,10 +96,10 @@ namespace SpatialElementGeometryCalculator
                 {
                   if( subface.SubfaceType == SubfaceType.Side )
                   {
-                    Element ele = doc.GetElement( subface.SpatialBoundaryElement.HostElementId );
+                    Element wall = doc.GetElement( subface.SpatialBoundaryElement.HostElementId );
                     double subfaceArea = subface.GetSubface().Area;
-                    double netArea = this.sqFootToSquareM( calwallAreaMinusOpenings( subfaceArea, ele, doc, room ) );
-                    s = s + "Room " + room.get_Parameter( BuiltInParameter.ROOM_NUMBER ).AsString() + " : Wall " + ele.get_Parameter( BuiltInParameter.ALL_MODEL_MARK ).AsString() + " : Area " + netArea.ToString() + "m2\r\n";
+                    double netArea = this.sqFootToSquareM( calwallAreaMinusOpenings( subfaceArea, wall, doc, room ) );
+                    s = s + "Room " + room.get_Parameter( BuiltInParameter.ROOM_NUMBER ).AsString() + " : Wall " + wall.get_Parameter( BuiltInParameter.ALL_MODEL_MARK ).AsString() + " : Area " + netArea.ToString() + "m2\r\n";
                   }
                 }
               }
