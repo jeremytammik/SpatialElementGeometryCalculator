@@ -33,27 +33,27 @@ namespace SpatialElementGeometryCalculator
     /// <param name="doc"></param>
     /// <param name="room"></param>
     /// <returns></returns>
-    double calwallAreaMinusOpenings( 
-      double subfaceArea, 
+    double calwallAreaMinusOpenings(
+      double subfaceArea,
       Element wall,
       Room room )
     {
       Document doc = wall.Document;
 
-      Debug.Assert( 
-        room.Document.ProjectInformation.UniqueId.Equals( 
+      Debug.Assert(
+        room.Document.ProjectInformation.UniqueId.Equals(
           doc.ProjectInformation.UniqueId ),
         "expected wall and room from same document" );
 
       // Determine all openings in the given wall.
 
-      FilteredElementCollector fiCol 
+      FilteredElementCollector fiCol
         = new FilteredElementCollector( doc )
           .OfClass( typeof( FamilyInstance ) );
 
-      List<ElementId> lstTotempDel 
+      List<ElementId> lstTotempDel
         = new List<ElementId>();
-      
+
       foreach( FamilyInstance fi in fiCol )
       {
         // The family instances hosted by this wall
@@ -61,22 +61,22 @@ namespace SpatialElementGeometryCalculator
         // a filtered element collector parameter filter.
         // This would be important in a large model.
 
-        if( fi.get_Parameter( 
+        if( fi.get_Parameter(
           BuiltInParameter.HOST_ID_PARAM )
-            .AsElementId().IntegerValue.Equals( 
+            .AsElementId().IntegerValue.Equals(
               wall.Id.IntegerValue ) )
         {
-          if( ( fi.Room != null ) 
+          if( ( fi.Room != null )
             && ( fi.Room.Id == room.Id ) )
           {
             lstTotempDel.Add( fi.Id );
           }
-          else if( ( fi.FromRoom != null ) 
+          else if( ( fi.FromRoom != null )
             && ( fi.FromRoom.Id == room.Id ) )
           {
             lstTotempDel.Add( fi.Id );
           }
-          else if( ( fi.ToRoom != null ) 
+          else if( ( fi.ToRoom != null )
             && ( fi.ToRoom.Id == room.Id ) )
           {
             lstTotempDel.Add( fi.Id );
@@ -92,14 +92,14 @@ namespace SpatialElementGeometryCalculator
       {
         Transaction t = new Transaction( doc );
 
-        double wallAreaNet = wall.get_Parameter( 
+        double wallAreaNet = wall.get_Parameter(
           BuiltInParameter.HOST_AREA_COMPUTED )
             .AsDouble();
 
         t.Start( "tmp Delete" );
         doc.Delete( lstTotempDel );
         doc.Regenerate();
-        double wallAreaGross = wall.get_Parameter( 
+        double wallAreaGross = wall.get_Parameter(
           BuiltInParameter.HOST_AREA_COMPUTED )
             .AsDouble();
         t.RollBack();
@@ -110,25 +110,25 @@ namespace SpatialElementGeometryCalculator
       return subfaceArea - openingArea;
     }
 
-    public Result Execute( 
-      ExternalCommandData commandData, 
-      ref string message, 
+    public Result Execute(
+      ExternalCommandData commandData,
+      ref string message,
       ElementSet elements )
     {
       UIApplication app = commandData.Application;
       Document doc = app.ActiveUIDocument.Document;
 
-      SpatialElementBoundaryOptions sebOptions 
+      SpatialElementBoundaryOptions sebOptions
         = new SpatialElementBoundaryOptions();
 
-      sebOptions.SpatialElementBoundaryLocation 
+      sebOptions.SpatialElementBoundaryLocation
         = SpatialElementBoundaryLocation.Finish;
 
       Result rc;
 
       try
       {
-        FilteredElementCollector roomCol 
+        FilteredElementCollector roomCol
           = new FilteredElementCollector( doc )
             .OfClass( typeof( SpatialElement ) );
 
@@ -144,48 +144,48 @@ namespace SpatialElementGeometryCalculator
             try
             {
               Autodesk.Revit.DB
-                .SpatialElementGeometryCalculator 
+                .SpatialElementGeometryCalculator
                   calc = new Autodesk.Revit.DB
-                    .SpatialElementGeometryCalculator( 
+                    .SpatialElementGeometryCalculator(
                       doc, sebOptions );
 
-              SpatialElementGeometryResults results 
-                = calc.CalculateSpatialElementGeometry( 
+              SpatialElementGeometryResults results
+                = calc.CalculateSpatialElementGeometry(
                   room );
 
               Solid roomSolid = results.GetGeometry();
 
               foreach( Face face in roomSolid.Faces )
               {
-                IList<SpatialElementBoundarySubface> 
-                  subfaceList = results.GetBoundaryFaceInfo( 
+                IList<SpatialElementBoundarySubface>
+                  subfaceList = results.GetBoundaryFaceInfo(
                     face );
 
-                foreach( SpatialElementBoundarySubface 
+                foreach( SpatialElementBoundarySubface
                   subface in subfaceList )
                 {
-                  if( subface.SubfaceType 
+                  if( subface.SubfaceType
                     == SubfaceType.Side )
                   {
-                    Element wall = doc.GetElement( 
+                    Element wall = doc.GetElement(
                       subface.SpatialBoundaryElement
                         .HostElementId );
 
                     double subfaceArea = subface
                       .GetSubface().Area;
 
-                    double netArea = sqFootToSquareM( 
-                      calwallAreaMinusOpenings( 
+                    double netArea = sqFootToSquareM(
+                      calwallAreaMinusOpenings(
                         subfaceArea, wall, room ) );
 
-                    s = s + "Room " 
-                      + room.get_Parameter( 
+                    s = s + "Room "
+                      + room.get_Parameter(
                         BuiltInParameter.ROOM_NUMBER )
-                          .AsString() 
-                      + " : Wall " + wall.get_Parameter( 
+                          .AsString()
+                      + " : Wall " + wall.get_Parameter(
                         BuiltInParameter.ALL_MODEL_MARK )
-                          .AsString() 
-                      + " : Area " + netArea.ToString() 
+                          .AsString()
+                      + " : Area " + netArea.ToString()
                       + " m2\r\n";
                   }
                 }
@@ -197,14 +197,14 @@ namespace SpatialElementGeometryCalculator
             }
           }
         }
-        TaskDialog.Show( "Room Boundaries", s);
+        TaskDialog.Show( "Room Boundaries", s );
 
         rc = Result.Succeeded;
       }
       catch( Exception ex )
       {
-        TaskDialog.Show( "Room Boundaries", 
-          ex.Message.ToString() + "\r\n" 
+        TaskDialog.Show( "Room Boundaries",
+          ex.Message.ToString() + "\r\n"
           + ex.StackTrace.ToString() );
 
         rc = Result.Failed;
