@@ -24,98 +24,184 @@ namespace SpatialElementGeometryCalculator
     }
 
     /// <summary>
-    /// Calculate wall area minus openings
+    /// Calculate wall area minus openings. Temporarily
+    /// delete all openings in a transaction that is
+    /// rolled back.
     /// </summary>
     /// <param name="subfaceArea">Initial gross subface area</param>
     /// <param name="wall"></param>
     /// <param name="doc"></param>
     /// <param name="room"></param>
     /// <returns></returns>
-    double calwallAreaMinusOpenings( double subfaceArea, Element wall, Document doc, Room room )
+    double calwallAreaMinusOpenings( 
+      double subfaceArea, 
+      Element wall,
+      Room room )
     {
-      FilteredElementCollector fiCol = new FilteredElementCollector( doc ).OfClass( typeof( FamilyInstance ) );
-      List<ElementId> lstTotempDel = new List<ElementId>();
+      Document doc = wall.Document;
+
+      Debug.Assert( 
+        room.Document.ProjectInformation.UniqueId.Equals( 
+          doc.ProjectInformation.UniqueId ),
+        "expected wall and room from same document" );
+
+      FilteredElementCollector fiCol 
+        = new FilteredElementCollector( doc )
+          .OfClass( typeof( FamilyInstance ) );
+
+      List<ElementId> lstTotempDel 
+        = new List<ElementId>();
+      
       foreach( FamilyInstance fi in fiCol )
       {
-        if( fi.get_Parameter( BuiltInParameter.HOST_ID_PARAM ).AsValueString() == wall.Id.ToString() )
+        // The family instances hosted by this wall
+        // could be filtered out more efficiently using 
+        // a filtered element collector parameter filter.
+
+        if( fi.get_Parameter( 
+          BuiltInParameter.HOST_ID_PARAM )
+            .AsElementId().IntegerValue.Equals( 
+              wall.Id.IntegerValue ) )
         {
-          if( ( fi.Room != null ) && ( fi.Room.Id == room.Id ) )
+          if( ( fi.Room != null ) 
+            && ( fi.Room.Id == room.Id ) )
           {
             lstTotempDel.Add( fi.Id );
           }
-          else if( ( fi.FromRoom != null ) && ( fi.FromRoom.Id == room.Id ) )
+          else if( ( fi.FromRoom != null ) 
+            && ( fi.FromRoom.Id == room.Id ) )
           {
             lstTotempDel.Add( fi.Id );
           }
-          else if( ( fi.ToRoom != null ) && ( fi.ToRoom.Id == room.Id ) )
+          else if( ( fi.ToRoom != null ) 
+            && ( fi.ToRoom.Id == room.Id ) )
           {
             lstTotempDel.Add( fi.Id );
           }
         }
       }
-      if( lstTotempDel.Count > 0 )
+
+      if( 0 < lstTotempDel.Count )
       {
-        Transaction t = new Transaction( doc, "tmp Delete" );
-        double wallnetArea = wall.get_Parameter( BuiltInParameter.HOST_AREA_COMPUTED ).AsDouble();
-        t.Start();
+        Transaction t = new Transaction( doc );
+
+        double wallnetArea = wall.get_Parameter( 
+          BuiltInParameter.HOST_AREA_COMPUTED )
+            .AsDouble();
+
+        t.Start( "tmp Delete" );
         doc.Delete( lstTotempDel );
         doc.Regenerate();
-        double wallGrossArea = wall.get_Parameter( BuiltInParameter.HOST_AREA_COMPUTED ).AsDouble();
+        double wallGrossArea = wall.get_Parameter( 
+          BuiltInParameter.HOST_AREA_COMPUTED )
+            .AsDouble();
         t.RollBack();
+
         double fiArea = wallGrossArea - wallnetArea;
+        
         return ( subfaceArea - fiArea );
       }
+
       return subfaceArea;
     }
 
-    public Result Execute( ExternalCommandData commandData, ref string message, ElementSet elements )
+    public Result Execute( 
+      ExternalCommandData commandData, 
+      ref string message, 
+      ElementSet elements )
     {
+      UIApplication app = commandData.Application;
+      Document doc = app.ActiveUIDocument.Document;
+
+      SpatialElementBoundaryOptions sebOptions 
+        = new SpatialElementBoundaryOptions();
+
+      sebOptions.SpatialElementBoundaryLocation 
+        = SpatialElementBoundaryLocation.Finish;
+
       Result rc;
+
       try
       {
-        UIApplication app = commandData.Application;
-        Document doc = app.ActiveUIDocument.Document;
-        FilteredElementCollector roomCol = new FilteredElementCollector( app.ActiveUIDocument.Document ).OfClass( typeof( SpatialElement ) );
-        string s = "Finished populating Rooms with Boundary Data\r\n\r\n";
+        FilteredElementCollector roomCol 
+          = new FilteredElementCollector( doc )
+            .OfClass( typeof( SpatialElement ) );
+
+        string s = "Finished populating Rooms with "
+          + "Boundary Data\r\n\r\n";
+
         foreach( SpatialElement e in roomCol )
         {
           Room room = e as Room;
+
           if( room != null )
           {
             try
             {
-              SpatialElementBoundaryOptions spatialElementBoundaryOptions = new SpatialElementBoundaryOptions();
-              spatialElementBoundaryOptions.SpatialElementBoundaryLocation = SpatialElementBoundaryLocation.Finish;
-              Autodesk.Revit.DB.SpatialElementGeometryCalculator calculator1 = new Autodesk.Revit.DB.SpatialElementGeometryCalculator( doc, spatialElementBoundaryOptions );
-              SpatialElementGeometryResults results = calculator1.CalculateSpatialElementGeometry( room );
+              Autodesk.Revit.DB
+                .SpatialElementGeometryCalculator 
+                  calc = new Autodesk.Revit.DB
+                    .SpatialElementGeometryCalculator( 
+                      doc, sebOptions );
+
+              SpatialElementGeometryResults results 
+                = calc.CalculateSpatialElementGeometry( 
+                  room );
+
               Solid roomSolid = results.GetGeometry();
+
               foreach( Face face in roomSolid.Faces )
               {
-                IList<SpatialElementBoundarySubface> subfaceList = results.GetBoundaryFaceInfo( face );
-                foreach( SpatialElementBoundarySubface subface in subfaceList )
+                IList<SpatialElementBoundarySubface> 
+                  subfaceList = results.GetBoundaryFaceInfo( 
+                    face );
+
+                foreach( SpatialElementBoundarySubface 
+                  subface in subfaceList )
                 {
-                  if( subface.SubfaceType == SubfaceType.Side )
+                  if( subface.SubfaceType 
+                    == SubfaceType.Side )
                   {
-                    Element wall = doc.GetElement( subface.SpatialBoundaryElement.HostElementId );
-                    double subfaceArea = subface.GetSubface().Area;
-                    double netArea = this.sqFootToSquareM( calwallAreaMinusOpenings( subfaceArea, wall, doc, room ) );
-                    s = s + "Room " + room.get_Parameter( BuiltInParameter.ROOM_NUMBER ).AsString() + " : Wall " + wall.get_Parameter( BuiltInParameter.ALL_MODEL_MARK ).AsString() + " : Area " + netArea.ToString() + "m2\r\n";
+                    Element wall = doc.GetElement( 
+                      subface.SpatialBoundaryElement
+                        .HostElementId );
+
+                    double subfaceArea = subface
+                      .GetSubface().Area;
+
+                    double netArea = sqFootToSquareM( 
+                      calwallAreaMinusOpenings( 
+                        subfaceArea, wall, room ) );
+
+                    s = s + "Room " 
+                      + room.get_Parameter( 
+                        BuiltInParameter.ROOM_NUMBER )
+                          .AsString() 
+                      + " : Wall " + wall.get_Parameter( 
+                        BuiltInParameter.ALL_MODEL_MARK )
+                          .AsString() 
+                      + " : Area " + netArea.ToString() 
+                      + "m2\r\n";
                   }
                 }
               }
               s = s + "\r\n";
             }
-            catch( Exception ex )
+            catch( Exception )
             {
             }
           }
         }
         TaskDialog.Show( "Room Boundaries", s);
+
         rc = Result.Succeeded;
       }
       catch( Exception ex )
       {
-         TaskDialog.Show( "Room Boundaries", ex.Message.ToString() + "\r\n" + ex.StackTrace.ToString() );
+        TaskDialog.Show( "Room Boundaries", 
+          ex.Message.ToString() + "\r\n" 
+          + ex.StackTrace.ToString() );
+
         rc = Result.Failed;
       }
       return rc;
