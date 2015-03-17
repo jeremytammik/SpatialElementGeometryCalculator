@@ -5,9 +5,8 @@ using System.Diagnostics;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Selection;
 using Autodesk.Revit.DB.Architecture;
+using Autodesk.Revit.UI;
 #endregion
 
 namespace SpatialElementGeometryCalculator
@@ -45,6 +44,8 @@ namespace SpatialElementGeometryCalculator
           doc.ProjectInformation.UniqueId ),
         "expected wall and room from same document" );
 
+      // Determine all openings in the given wall.
+
       FilteredElementCollector fiCol 
         = new FilteredElementCollector( doc )
           .OfClass( typeof( FamilyInstance ) );
@@ -81,28 +82,30 @@ namespace SpatialElementGeometryCalculator
         }
       }
 
+      // Determine total area of all openings.
+
+      double openingArea = 0;
+
       if( 0 < lstTotempDel.Count )
       {
         Transaction t = new Transaction( doc );
 
-        double wallnetArea = wall.get_Parameter( 
+        double wallAreaNet = wall.get_Parameter( 
           BuiltInParameter.HOST_AREA_COMPUTED )
             .AsDouble();
 
         t.Start( "tmp Delete" );
         doc.Delete( lstTotempDel );
         doc.Regenerate();
-        double wallGrossArea = wall.get_Parameter( 
+        double wallAreaGross = wall.get_Parameter( 
           BuiltInParameter.HOST_AREA_COMPUTED )
             .AsDouble();
         t.RollBack();
 
-        double fiArea = wallGrossArea - wallnetArea;
-        
-        return ( subfaceArea - fiArea );
+        openingArea = wallAreaGross - wallAreaNet;
       }
 
-      return subfaceArea;
+      return subfaceArea - openingArea;
     }
 
     public Result Execute( 
