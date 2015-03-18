@@ -84,6 +84,20 @@ namespace SpatialElementGeometryCalculator
         }
       }
 
+#if DEBUG
+      // This approach is much more efficient and 
+      // entirely avoids the use of all filtered 
+      // element collectors.
+
+      IList<ElementId> inserts = ( wall as HostObject )
+        .FindInserts( true, true, true, true );
+
+      Debug.Assert( 
+        lstTotempDel.Count.Equals( inserts.Count ),
+        "expected FindInserts to return the same openings" );
+#endif // DEBUG
+
+
       // Determine total area of all openings.
 
       double openingArea = 0;
