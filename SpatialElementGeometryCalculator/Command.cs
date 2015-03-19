@@ -107,7 +107,7 @@ namespace SpatialElementGeometryCalculator
 
       double openingArea = 0;
 
-      if( 0 < lstTotempDel.Count )
+      if( 0 < inserts.Count )
       {
         Transaction t = new Transaction( doc );
 
