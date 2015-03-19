@@ -32,5 +32,9 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion( "2015.0.0.0" )]
-[assembly: AssemblyFileVersion( "2015.0.0.0" )]
+//
+// 2015-03-17 2015.0.0.0 initial porting from VB.NET, cleaned up and enhanced the filtering 
+// 2015-03-19 2015.0.0.1 use FindInserts instead of filtered element collector
+
+[assembly: AssemblyVersion( "2015.0.0.1" )]
+[assembly: AssemblyFileVersion( "2015.0.0.1" )]

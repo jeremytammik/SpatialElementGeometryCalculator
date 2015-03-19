@@ -40,6 +40,8 @@ namespace SpatialElementGeometryCalculator
     {
       Document doc = wall.Document;
 
+      // Is this a reliable way to compare documents?
+
       Debug.Assert(
         room.Document.ProjectInformation.UniqueId.Equals(
           doc.ProjectInformation.UniqueId ),
@@ -47,6 +49,7 @@ namespace SpatialElementGeometryCalculator
 
       // Determine all openings in the given wall.
 
+#if DEBUG
       FilteredElementCollector fiCol
         = new FilteredElementCollector( doc )
           .OfClass( typeof( FamilyInstance ) );
@@ -83,20 +86,22 @@ namespace SpatialElementGeometryCalculator
           }
         }
       }
+#endif // DEBUG
 
-#if DEBUG
-      // This approach is much more efficient and 
+      // FindInserts is much more efficient and 
       // entirely avoids the use of all filtered 
       // element collectors.
 
       IList<ElementId> inserts = ( wall as HostObject )
         .FindInserts( true, true, true, true );
 
-      Debug.Assert( 
-        lstTotempDel.Count.Equals( inserts.Count ),
-        "expected FindInserts to return the same openings" );
-#endif // DEBUG
+      // In the case of a compound wall, FindInserts
+      // will return the openings, whereas the filtered
+      // element collector will not.
 
+      Debug.Assert(
+        lstTotempDel.Count <= inserts.Count,
+        "expected FindInserts to return all openings" );
 
       // Determine total area of all openings.
 
@@ -111,7 +116,7 @@ namespace SpatialElementGeometryCalculator
             .AsDouble();
 
         t.Start( "tmp Delete" );
-        doc.Delete( lstTotempDel );
+        doc.Delete( inserts );
         doc.Regenerate();
         double wallAreaGross = wall.get_Parameter(
           BuiltInParameter.HOST_AREA_COMPUTED )
