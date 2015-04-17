@@ -10,9 +10,10 @@ For a detailed desciption, please refer to the original Revit API discussion thr
 
 ## Authors
 
-Phillip Miller, [Kiwi Codes Solutions Ltd.](http://www.kiwicodes.com),
-Jeremy Tammik, [The Building Coder](http://thebuildingcoder.typepad.com), Autodesk Inc. and Vilo.
-
+- Phillip Miller, [Kiwi Codes Solutions Ltd.](http://www.kiwicodes.com)
+- Jeremy Tammik, [The Building Coder](http://thebuildingcoder.typepad.com), [ADN](http://www.autodesk.com/adn) [Open](http://www.autodesk.com/adnopen), [Autodesk Inc.](http://www.autodesk.com)
+- Vilo
+- [Håkon Clausen](http://hclausen.net)
 
 ## License
 
