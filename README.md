@@ -14,7 +14,7 @@ For a detailed desciption, please refer to the original Revit API discussion thr
 - Phillip Miller, [Kiwi Codes Solutions Ltd.](http://www.kiwicodes.com)
 - Jeremy Tammik, [The Building Coder](http://thebuildingcoder.typepad.com), [ADN](http://www.autodesk.com/adn) [Open](http://www.autodesk.com/adnopen), [Autodesk Inc.](http://www.autodesk.com)
 - Vilo
-- [Håkon Clausen](http://hclausen.net) enhanced for multiple
+- [Håkon Clausen](http://hclausen.net)
 
 ## License
 
