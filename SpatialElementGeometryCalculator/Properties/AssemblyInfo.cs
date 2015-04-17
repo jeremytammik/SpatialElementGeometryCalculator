@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration( "" )]
 [assembly: AssemblyCompany( "Autodesk Inc." )]
 [assembly: AssemblyProduct( "SpatialElementGeometryCalculator" )]
-[assembly: AssemblyCopyright( "Copyright 2015 © Phillip Miller, Kiwi Codes Solutions Ltd. and Jeremy Tammik, Autodesk Inc." )]
+[assembly: AssemblyCopyright( "Copyright 2015 © Phillip Miller, Kiwi Codes Solutions Ltd., Jeremy Tammik, Autodesk Inc., Håkon Clausen" )]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
 
@@ -35,6 +35,7 @@ using System.Runtime.InteropServices;
 //
 // 2015-03-17 2015.0.0.0 initial porting from VB.NET, cleaned up and enhanced the filtering 
 // 2015-03-19 2015.0.0.1 use FindInserts instead of filtered element collector
-
-[assembly: AssemblyVersion( "2015.0.0.1" )]
-[assembly: AssemblyFileVersion( "2015.0.0.1" )]
+// 2015-04-16 2015.0.0.2 reimplementation by Håkon Clausen: issue #1, pull request #2
+//
+[assembly: AssemblyVersion( "2015.0.0.2" )]
+[assembly: AssemblyFileVersion( "2015.0.0.2" )]
