@@ -35,7 +35,7 @@ using System.Runtime.InteropServices;
 //
 // 2015-03-17 2015.0.0.0 initial porting from VB.NET, cleaned up and enhanced the filtering 
 // 2015-03-19 2015.0.0.1 use FindInserts instead of filtered element collector
-// 2015-04-16 2015.0.0.2 reimplementation by Håkon Clausen: issue #1, pull request #2
+// 2015-04-16 2015.0.0.3 reimplementation by Håkon Clausen: issue #1, pull request #2
 //
-[assembly: AssemblyVersion( "2015.0.0.2" )]
-[assembly: AssemblyFileVersion( "2015.0.0.2" )]
+[assembly: AssemblyVersion( "2015.0.0.3" )]
+[assembly: AssemblyFileVersion( "2015.0.0.3" )]
