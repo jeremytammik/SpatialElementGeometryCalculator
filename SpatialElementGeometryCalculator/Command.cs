@@ -12,9 +12,9 @@ namespace SpatialElementGeometryCalculator
   [Transaction( TransactionMode.Manual )]
   public class Command : IExternalCommand
   {
-    public Result Execute( 
-      ExternalCommandData commandData, 
-      ref string message, 
+    public Result Execute(
+      ExternalCommandData commandData,
+      ref string message,
       ElementSet elements )
     {
       var app = commandData.Application;
@@ -32,12 +32,13 @@ namespace SpatialElementGeometryCalculator
           if( room == null ) continue;
           if( room.Location == null ) continue;
 
-          var sebOptions = new SpatialElementBoundaryOptions 
-          { SpatialElementBoundaryLocation 
-            = SpatialElementBoundaryLocation.Finish 
+          var sebOptions = new SpatialElementBoundaryOptions
+          {
+            SpatialElementBoundaryLocation
+            = SpatialElementBoundaryLocation.Finish
           };
           var calc = new Autodesk.Revit.DB
-            .SpatialElementGeometryCalculator( 
+            .SpatialElementGeometryCalculator(
               doc, sebOptions );
 
           var results = calc
@@ -53,11 +54,11 @@ namespace SpatialElementGeometryCalculator
             foreach( var subface in results
               .GetBoundaryFaceInfo( face ) )
             {
-              if( subface.SubfaceType 
+              if( subface.SubfaceType
                 != SubfaceType.Side ) { continue; }
 
               var wall = doc.GetElement( subface
-                .SpatialBoundaryElement.HostElementId ) 
+                .SpatialBoundaryElement.HostElementId )
                   as HostObject;
 
               if( wall == null ) { continue; }
@@ -76,10 +77,10 @@ namespace SpatialElementGeometryCalculator
           foreach( var id in walls.Keys )
           {
             var wall = (HostObject) doc.GetElement( id );
-            var openings = CalculateWallOpeningArea( 
+            var openings = CalculateWallOpeningArea(
               wall, room );
 
-            s += string.Format( 
+            s += string.Format(
               "Room: {2} Wall: {0} Area: {1} m2\r\n",
               wall.get_Parameter( BuiltInParameter.ALL_MODEL_MARK ).AsString(),
               SqFootToSquareM( walls[id] - openings ),
@@ -91,7 +92,7 @@ namespace SpatialElementGeometryCalculator
       }
       catch( Exception ex )
       {
-        TaskDialog.Show( "Room Boundaries", 
+        TaskDialog.Show( "Room Boundaries",
           ex.Message + "\r\n" + ex.StackTrace );
         rc = Result.Failed;
       }
@@ -103,7 +104,7 @@ namespace SpatialElementGeometryCalculator
     /// Convert square feet to square meters
     /// with two decimal places precision.
     /// </summary>
-    private static double SqFootToSquareM( 
+    private static double SqFootToSquareM(
       double sqFoot )
     {
       return Math.Round( sqFoot * 0.092903, 2 );
@@ -114,21 +115,21 @@ namespace SpatialElementGeometryCalculator
     /// delete all openings in a transaction that is
     /// rolled back.
     /// </summary>
-    private static double CalculateWallOpeningArea( 
-      HostObject wall, 
+    private static double CalculateWallOpeningArea(
+      HostObject wall,
       Room room )
     {
       var doc = wall.Document;
-      var wallAreaNet = wall.get_Parameter( 
+      var wallAreaNet = wall.get_Parameter(
         BuiltInParameter.HOST_AREA_COMPUTED ).AsDouble();
 
       var t = new Transaction( doc );
       t.Start( "Temp" );
-      foreach( var id in wall.FindInserts( 
+      foreach( var id in wall.FindInserts(
         true, true, true, true ) )
       {
         var insert = doc.GetElement( id );
-        if( insert is FamilyInstance 
+        if( insert is FamilyInstance
           && IsInRoom( room, (FamilyInstance) insert ) )
         {
           doc.Delete( id );
@@ -136,7 +137,7 @@ namespace SpatialElementGeometryCalculator
       }
 
       doc.Regenerate();
-      var wallAreaGross = wall.get_Parameter( 
+      var wallAreaGross = wall.get_Parameter(
         BuiltInParameter.HOST_AREA_COMPUTED ).AsDouble();
       t.RollBack();
 
@@ -147,13 +148,13 @@ namespace SpatialElementGeometryCalculator
     /// Predicate to determine whether the given 
     /// family instance belongs to the given room.
     /// </summary>
-    static bool IsInRoom( 
-      Room room, 
+    static bool IsInRoom(
+      Room room,
       FamilyInstance f )
     {
       ElementId rid = room.Id;
-      return ( ( f.Room != null && f.Room.Id == rid ) 
-        || ( f.ToRoom != null && f.ToRoom.Id == rid ) 
+      return ( ( f.Room != null && f.Room.Id == rid )
+        || ( f.ToRoom != null && f.ToRoom.Id == rid )
         || ( f.FromRoom != null && f.FromRoom.Id == rid ) );
     }
   }

@@ -4,9 +4,11 @@ Revit add-in demonstrating use of SpatialElementGeometryCalculator to determine 
 
 For a detailed desciption, please refer to the original Revit API discussion thread on
 [Door/Window Areas](http://forums.autodesk.com/t5/revit-api/door-window-areas/td-p/5535565) and
-[The Building Coder](http://thebuildingcoder.typepad.com) discussions on
-[calculating gross and net wall areas](http://thebuildingcoder.typepad.com/blog/2015/03/calculating-gross-and-net-wall-areas.html) and
-[using FindInserts to retrieve all openings in all wall types](http://thebuildingcoder.typepad.com/blog/2015/03/findinserts-retrieves-all-openings-in-all-wall-types.html).
+[The Building Coder](http://thebuildingcoder.typepad.com) discussions on:
+
+- [Calculating gross and net wall areas](http://thebuildingcoder.typepad.com/blog/2015/03/calculating-gross-and-net-wall-areas.html)
+- [Using FindInserts to retrieve all openings in all wall types](http://thebuildingcoder.typepad.com/blog/2015/03/findinserts-retrieves-all-openings-in-all-wall-types.html)
+- [Gross and Net Wall Area Calculation Enhancement](http://thebuildingcoder.typepad.com/blog/2015/04/gross-and-net-wall-area-calculation-enhancement-and-events.html)
 
 
 ## Authors
