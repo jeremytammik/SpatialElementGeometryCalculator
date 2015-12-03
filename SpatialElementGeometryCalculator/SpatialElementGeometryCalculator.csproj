@@ -67,7 +67,7 @@
     <Delete Files="$(AppData)\Autodesk\REVIT\Addins\2015\SpatialElementGeometryCalculator.dll" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>copy "$(ProjectDir)SpatialElementGeometryCalculator.addin" "$(AppData)\Autodesk\REVIT\Addins\2015"
-copy "$(ProjectDir)bin\debug\SpatialElementGeometryCalculator.dll" "$(AppData)\Autodesk\REVIT\Addins\2015"</PostBuildEvent>
+    <PostBuildEvent>copy "$(ProjectDir)SpatialElementGeometryCalculator.addin" "$(AppData)\Autodesk\REVIT\Addins\2016"
+copy "$(ProjectDir)bin\debug\SpatialElementGeometryCalculator.dll" "$(AppData)\Autodesk\REVIT\Addins\2016"</PostBuildEvent>
   </PropertyGroup>
 </Project>
