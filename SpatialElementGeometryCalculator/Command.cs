@@ -45,8 +45,8 @@ namespace SpatialElementGeometryCalculator
           var results = calc
             .CalculateSpatialElementGeometry( room );
 
-          // To keep track of each wall and 
-          // its total area in the room
+          // Keep track of each wall and 
+          // its total area in the room.
 
           var walls = new Dictionary<string, double>();
 
@@ -105,8 +105,7 @@ namespace SpatialElementGeometryCalculator
     /// Convert square feet to square meters
     /// with two decimal places precision.
     /// </summary>
-    private static double SqFootToSquareM(
-      double sqFoot )
+    static double SqFootToSquareM( double sqFoot )
     {
       return Math.Round( sqFoot * 0.092903, 2 );
     }
@@ -116,7 +115,7 @@ namespace SpatialElementGeometryCalculator
     /// delete all openings in a transaction that is
     /// rolled back.
     /// </summary>
-    private static double CalculateWallOpeningArea(
+    static double CalculateWallOpeningArea(
       HostObject wall,
       Room room )
     {
@@ -153,10 +152,10 @@ namespace SpatialElementGeometryCalculator
       Room room,
       FamilyInstance f )
     {
-      ElementId rid = room.Id;
-      return ( ( f.Room != null && f.Room.Id == rid )
-        || ( f.ToRoom != null && f.ToRoom.Id == rid )
-        || ( f.FromRoom != null && f.FromRoom.Id == rid ) );
+      ElementId id = room.Id;
+      return ( ( f.Room != null && f.Room.Id == id )
+        || ( f.ToRoom != null && f.ToRoom.Id == id )
+        || ( f.FromRoom != null && f.FromRoom.Id == id ) );
     }
   }
 }

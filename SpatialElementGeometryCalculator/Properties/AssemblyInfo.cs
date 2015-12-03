@@ -36,7 +36,7 @@ using System.Runtime.InteropServices;
 // 2015-03-17 2015.0.0.0 initial porting from VB.NET, cleaned up and enhanced the filtering 
 // 2015-03-19 2015.0.0.1 use FindInserts instead of filtered element collector
 // 2015-04-16 2015.0.0.3 reimplementation by Hakon Clausen: issue #1, pull request #2
-// 2015-12-03 2015.0.0.4 fixed bug caused by element deletion within filtered element collector MoveNext /a/doc/revit/tbc/img/spatial_element_geomatry_calculator_error.png http://thebuildingcoder.typepad.com/blog/2015/11/connecting-desktop-and-cloud-at-au-and-devdays.html#comment-2374024687
+// 2015-12-03 2015.0.0.4 fixed bug caused by element deletion within filtered element collector MoveNext /a/doc/revit/tbc/img/spatial_element_geomatry_calculator_error.png http://thebuildingcoder.typepad.com/blog/2015/03/findinserts-retrieves-all-openings-in-all-wall-types.html#comment-2380592080
 //
 [assembly: AssemblyVersion( "2015.0.0.4" )]
 [assembly: AssemblyFileVersion( "2015.0.0.4" )]
