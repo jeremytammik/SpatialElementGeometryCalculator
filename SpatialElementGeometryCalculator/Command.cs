@@ -23,12 +23,13 @@ namespace SpatialElementGeometryCalculator
       string s = string.Empty;
       try
       {
-        var roomCol = new FilteredElementCollector( doc )
-          .OfClass( typeof( SpatialElement ) );
+        var roomIds = new FilteredElementCollector( doc )
+          .OfClass( typeof( SpatialElement ) )
+          .ToElementIds();
 
-        foreach( var e in roomCol )
+        foreach( var id in roomIds )
         {
-          var room = e as Room;
+          var room = doc.GetElement( id ) as Room;
           if( room == null ) continue;
           if( room.Location == null ) continue;
 
@@ -74,16 +75,16 @@ namespace SpatialElementGeometryCalculator
             }
           }
 
-          foreach( var id in walls.Keys )
+          foreach( var id2 in walls.Keys )
           {
-            var wall = (HostObject) doc.GetElement( id );
+            var wall = (HostObject) doc.GetElement( id2 );
             var openings = CalculateWallOpeningArea(
               wall, room );
 
             s += string.Format(
               "Room: {2} Wall: {0} Area: {1} m2\r\n",
               wall.get_Parameter( BuiltInParameter.ALL_MODEL_MARK ).AsString(),
-              SqFootToSquareM( walls[id] - openings ),
+              SqFootToSquareM( walls[id2] - openings ),
               room.get_Parameter( BuiltInParameter.ROOM_NUMBER ).AsString() );
           }
         }
