@@ -10,7 +10,7 @@ For a detailed desciption, please refer to the original Revit API discussion thr
 - [Using FindInserts to retrieve all openings in all wall types](http://thebuildingcoder.typepad.com/blog/2015/03/findinserts-retrieves-all-openings-in-all-wall-types.html)
 - [Gross and Net Wall Area Calculation Enhancement](http://thebuildingcoder.typepad.com/blog/2015/04/gross-and-net-wall-area-calculation-enhancement-and-events.html)
 - [Wall Area Calculation Handling Multiple Openings in Multiple Walls in Multiple Rooms](http://thebuildingcoder.typepad.com/blog/2015/04/gross-and-net-wall-area-calculation-enhancement-and-events.html#6)
-- [ifcexportutils](http://thebuildingcoder.typepad.com/blog/2015/03/ifcexportutils-methods-determine-door-and-window-area.html)
+- [IFCExportUtils Determine Door and Window Area](http://thebuildingcoder.typepad.com/blog/2015/03/ifcexportutils-methods-determine-door-and-window-area.html)
 - [Bug Fix &ndash; do not delete while iterating](http://thebuildingcoder.typepad.com/blog/2015/12/au-ioc-banks-and-not-to-delete-while-iterating.html#2)
 - [Migration to Revit 2016](http://thebuildingcoder.typepad.com/blog/2015/12/au-ioc-banks-and-not-to-delete-while-iterating.html#3)
 
