@@ -18,24 +18,24 @@ namespace SpatialElementGeometryCalculator
          .FirstOrDefault()
          .Id;
 
-      GraphicsStyle style
-        = new FilteredElementCollector( doc )
-          .OfClass( typeof( GraphicsStyle ) )
-        .Cast<GraphicsStyle>()
-        .FirstOrDefault<GraphicsStyle>(
-          gs => gs.Name.Equals( "Walls" ) );
+      //GraphicsStyle style
+      //  = new FilteredElementCollector( doc )
+      //    .OfClass( typeof( GraphicsStyle ) )
+      //  .Cast<GraphicsStyle>()
+      //  .FirstOrDefault<GraphicsStyle>(
+      //    gs => gs.Name.Equals( "Walls" ) );
 
-      ElementId idGraphicsStyle = null;
+      //ElementId idGraphicsStyle = null;
 
-      if( style != null )
-      {
-        idGraphicsStyle = style.Id;
-      }
-      else
-      {
-        LogCreator.LogEntry( "Cant create DirectShape because the Graphic Style was not found." );
-        return null;
-      }
+      //if( style != null )
+      //{
+      //  idGraphicsStyle = style.Id;
+      //}
+      //else
+      //{
+      //  LogCreator.LogEntry( "Cant create DirectShape because the Graphic Style was not found." );
+      //  return null;
+      //}
 
       try
       {
