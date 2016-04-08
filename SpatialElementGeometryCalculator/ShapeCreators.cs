@@ -12,11 +12,11 @@ namespace SpatialElementGeometryCalculator
       Solid transientSolid,
       string dsName )
     {
-      ElementId idMaterial
-        = new FilteredElementCollector( doc )
-         .OfClass( typeof( Material ) )
-         .FirstOrDefault()
-         .Id;
+      //ElementId idMaterial
+      //  = new FilteredElementCollector( doc )
+      //   .OfClass( typeof( Material ) )
+      //   .FirstOrDefault()
+      //   .Id;
 
       //GraphicsStyle style
       //  = new FilteredElementCollector( doc )
