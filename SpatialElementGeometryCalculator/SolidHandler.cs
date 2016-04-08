@@ -1,26 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-//using System.Threading.Tasks;
-using System.Diagnostics;
-
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.IFC;
-using Autodesk.Revit.DB.Architecture;
-//using Autodesk.Revit.ApplicationServices;
-
 
 namespace SpatialElementGeometryCalculator
 {
-  class SolidHandlers
+  class SolidHandler
   {
-
     public double GetWallAsOpeningArea( Element elemOpening, Solid solidRoom )
     {
       Document doc = elemOpening.Document;
 
-      Wall wallAsOpening = elemOpening as Wall;  //most likely an embedded curtainwall acting as window
+      Wall wallAsOpening = elemOpening as Wall;  // most likely an embedded curtainwall acting as window
 
       Options options = wallAsOpening.Document.Application.Create.NewGeometryOptions();
       options.ComputeReferences = true;
@@ -58,7 +49,6 @@ namespace SpatialElementGeometryCalculator
 
       return openingArea;
     }
-
 
     public IList<CurveLoop> XYZAsCurveloop( List<XYZ> polyPoints )
     {
@@ -178,7 +168,6 @@ namespace SpatialElementGeometryCalculator
           polygons.Add( vertices );
         }
       }
-
       return null != outermost;
     }
 
@@ -200,7 +189,6 @@ namespace SpatialElementGeometryCalculator
 
     public double GetLargestFaceArea( Solid intersectSolid )
     {
-
       FaceArray faceArray = intersectSolid.Faces;
 
       Face targetFace = null;
@@ -215,9 +203,7 @@ namespace SpatialElementGeometryCalculator
           targetFace = face;
           dblFaceMaxSoFar = dblAreaThisFace;
         }
-
       }
-
       return dblFaceMaxSoFar;
     }
 

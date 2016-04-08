@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.IFC;
 using Autodesk.Revit.DB.Architecture;
@@ -13,7 +11,7 @@ namespace SpatialElementGeometryCalculator
   class OpeningHandler
   {
     public double GetOpeningArea( 
-      SolidHandlers solidHandlers, 
+      SolidHandler solidHandlers, 
       Element elemHost, 
       Element elemInsert, 
       Room room, 
@@ -84,7 +82,7 @@ namespace SpatialElementGeometryCalculator
         optCompRef.DetailLevel = ViewDetailLevel.Medium;
       }
 
-      SolidHandlers solHandler = new SolidHandlers();
+      SolidHandler solHandler = new SolidHandler();
       XYZ cutDir = null;
 
       if( !isStacked )

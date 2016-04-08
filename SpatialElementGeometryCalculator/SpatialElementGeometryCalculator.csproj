@@ -66,8 +66,8 @@
     <Compile Include="LogCreator.cs" />
     <Compile Include="OpeningHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ShapeCreators.cs" />
-    <Compile Include="SolidHandlers.cs" />
+    <Compile Include="ShapeCreator.cs" />
+    <Compile Include="SolidHandler.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
