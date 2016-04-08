@@ -85,7 +85,8 @@ namespace SpatialElementGeometryCalculator
       Wall wall, 
       bool isStacked )
     {
-      Options optCompRef = doc.Application.Create.NewGeometryOptions();
+      Options optCompRef 
+        = doc.Application.Create.NewGeometryOptions();
 
       if( null != optCompRef )
       {
@@ -105,7 +106,8 @@ namespace SpatialElementGeometryCalculator
         IList<CurveLoop> loops = new List<CurveLoop>( 1 );
         loops.Add( curveLoop );
 
-        return ExporterIFCUtils.ComputeAreaOfCurveLoops( loops );
+        return ExporterIFCUtils.ComputeAreaOfCurveLoops( 
+          loops );
       }
 
       else if( isStacked )
@@ -134,23 +136,30 @@ namespace SpatialElementGeometryCalculator
 
         Solid intersectSolid 
           = BooleanOperationsUtils.ExecuteBooleanOperation( 
-            solidOpening, solidHost, BooleanOperationsType.Intersect );
+            solidOpening, solidHost, 
+            BooleanOperationsType.Intersect );
 
         if( intersectSolid.Faces.Size.Equals( 0 ) )
         {
-          solidOpening = GeometryCreationUtilities.CreateExtrusionGeometry( 
-            loops, cutDir, .1 );
+          solidOpening 
+            = GeometryCreationUtilities.CreateExtrusionGeometry( 
+              loops, cutDir, .1 );
 
-          intersectSolid = BooleanOperationsUtils.ExecuteBooleanOperation( 
-            solidOpening, solidHost, BooleanOperationsType.Intersect );
+          intersectSolid 
+            = BooleanOperationsUtils.ExecuteBooleanOperation( 
+              solidOpening, solidHost, 
+              BooleanOperationsType.Intersect );
         }
 
         if( DebugHandler.EnableSolidUtilityVolumes )
         {
-          Transaction trans = new Transaction( doc, "stacked" );
-          trans.Start( "stacked1" );
-          ShapeCreator.CreateDirectShape( doc, intersectSolid, "stackedOpening" );
-          trans.Commit();
+          using( Transaction trans = new Transaction( doc ) )
+          {
+            trans.Start( "stacked1" );
+            ShapeCreator.CreateDirectShape( doc, 
+              intersectSolid, "stackedOpening" );
+            trans.Commit();
+          }
         }
         return solHandler.GetLargestFaceArea( intersectSolid );
       }
