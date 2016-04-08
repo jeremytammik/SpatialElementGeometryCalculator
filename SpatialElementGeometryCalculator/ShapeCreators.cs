@@ -12,28 +12,24 @@ namespace SpatialElementGeometryCalculator
       Solid transientSolid,
       string dsName )
     {
-      List<Material> lstMaterials
+      ElementId idMaterial
         = new FilteredElementCollector( doc )
          .OfClass( typeof( Material ) )
-         .Cast<Material>()
-         .ToList<Material>();
+         .FirstOrDefault()
+         .Id;
 
-      ElementId idMaterial = lstMaterials.First().Id;
-
-      FilteredElementCollector collector
+      GraphicsStyle style
         = new FilteredElementCollector( doc )
-          .OfClass( typeof( GraphicsStyle ) );
-
-      GraphicsStyle style = collector
+          .OfClass( typeof( GraphicsStyle ) )
         .Cast<GraphicsStyle>()
-        .FirstOrDefault<GraphicsStyle>( 
+        .FirstOrDefault<GraphicsStyle>(
           gs => gs.Name.Equals( "Walls" ) );
 
-      ElementId graphicsStyleId = null;
+      ElementId idGraphicsStyle = null;
 
       if( style != null )
       {
-        graphicsStyleId = style.Id;
+        idGraphicsStyle = style.Id;
       }
       else
       {
