@@ -7,7 +7,9 @@ namespace SpatialElementGeometryCalculator
 {
   class SolidHandler
   {
-    public double GetWallAsOpeningArea( Element elemOpening, Solid solidRoom )
+    public double GetWallAsOpeningArea( 
+      Element elemOpening, 
+      Solid solidRoom )
     {
       Document doc = elemOpening.Document;
 
@@ -45,12 +47,18 @@ namespace SpatialElementGeometryCalculator
       }
 
       double openingArea = GetLargestFaceArea( intersectSolid );
-      LogCreator.LogEntry( ";_______OPENINGAREA;" + elemOpening.Id.ToString() + ";" + elemOpening.Category.Name + ";" + elemOpening.Name + ";" + ( openingArea * 0.09290304 ).ToString() );
+
+      LogCreator.LogEntry( ";_______OPENINGAREA;" 
+        + elemOpening.Id.ToString() + ";" 
+        + elemOpening.Category.Name + ";" 
+        + elemOpening.Name + ";" 
+        + ( openingArea * 0.09290304 ).ToString() );
 
       return openingArea;
     }
 
-    public IList<CurveLoop> XYZAsCurveloop( List<XYZ> polyPoints )
+    public IList<CurveLoop> XYZAsCurveloop( 
+      List<XYZ> polyPoints )
     {
       CurveLoop curveLoop = new CurveLoop();
 

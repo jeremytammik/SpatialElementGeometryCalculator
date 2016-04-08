@@ -12,6 +12,9 @@ namespace SpatialElementGeometryCalculator
   [Transaction( TransactionMode.Manual )]
   public class Command : IExternalCommand
   {
+    const BuiltInParameter _bipRoomNr = BuiltInParameter.ROOM_NUMBER;
+    const BuiltInParameter _bipMark = BuiltInParameter.ALL_MODEL_MARK;
+
     public Result Execute(
       ExternalCommandData commandData,
       ref string message,
@@ -78,26 +81,29 @@ namespace SpatialElementGeometryCalculator
           foreach( var id2 in walls.Keys )
           {
             var wall = (HostObject) doc.GetElement( id2 );
+
             var openings = CalculateWallOpeningArea(
               wall, room );
 
             s += string.Format(
-              "Room: {2} Wall: {0} Area: {1} m2\r\n",
-              wall.get_Parameter( BuiltInParameter.ALL_MODEL_MARK ).AsString(),
-              SqFootToSquareM( walls[id2] - openings ),
-              room.get_Parameter( BuiltInParameter.ROOM_NUMBER ).AsString() );
+              "Room: {0} Wall: {1} Area: {2} m2\r\n",
+              room.get_Parameter( _bipRoomNr ).AsString(),
+              wall.get_Parameter( _bipMark ).AsString(),
+              SqFootToSquareM( walls[id2] - openings ) );
           }
         }
-        TaskDialog.Show( "Room Boundaries", s );
+        
+        TaskDialog.Show( "Room Wall Areas", s );
+
         rc = Result.Succeeded;
       }
       catch( Exception ex )
       {
-        TaskDialog.Show( "Room Boundaries",
+        TaskDialog.Show( "Room Wall Areas",
           ex.Message + "\r\n" + ex.StackTrace );
+
         rc = Result.Failed;
       }
-
       return rc;
     }
 

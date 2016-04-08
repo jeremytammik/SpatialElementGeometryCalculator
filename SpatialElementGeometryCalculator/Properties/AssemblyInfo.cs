@@ -39,6 +39,8 @@ using System.Runtime.InteropServices;
 // 2015-12-03 2015.0.0.4 fixed bug caused by element deletion within filtered element collector MoveNext /a/doc/revit/tbc/img/spatial_element_geomatry_calculator_error.png http://thebuildingcoder.typepad.com/blog/2015/03/findinserts-retrieves-all-openings-in-all-wall-types.html#comment-2380592080
 // 2015-12-03 2015.0.0.5 cleanup before migrating to Revit 2016
 // 2015-12-03 2016.0.0.0 flat migration to Revit 2016 - zero changes, zero errors, zero warnings
+// 2016-04-08 2016.0.0.1 integrated added OpeningHandler.cs by Håvard Dagsvik
+// 2016-04-08 2016.0.0.2 cleanup but not yet tested
 //
-[assembly: AssemblyVersion( "2016.0.0.0" )]
-[assembly: AssemblyFileVersion( "2016.0.0.0" )]
+[assembly: AssemblyVersion( "2016.0.0.2" )]
+[assembly: AssemblyFileVersion( "2016.0.0.2" )]

@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.IFC;
 using Autodesk.Revit.DB.Architecture;
-using System.Diagnostics;
 
 namespace SpatialElementGeometryCalculator
 {
   class OpeningHandler
   {
     public double GetOpeningArea( 
-      SolidHandler solidHandlers, 
+      SolidHandler solidHandler, 
       Element elemHost, 
       Element elemInsert, 
       Room room, 
@@ -21,7 +21,8 @@ namespace SpatialElementGeometryCalculator
       Document doc = room.Document;
       double openingArea = 0;
 
-      Parameter demoInsert = elemInsert.get_Parameter( BuiltInParameter.PHASE_DEMOLISHED ) as Parameter;
+      Parameter demoInsert = elemInsert.get_Parameter( 
+        BuiltInParameter.PHASE_DEMOLISHED ) as Parameter;
 
       if( demoInsert != null )
       {
@@ -47,7 +48,8 @@ namespace SpatialElementGeometryCalculator
             catch
             {
               openingArea = 0;
-              LogCreator.LogEntry( "WallCut Failed on " + elemHost.Id.ToString() );
+              LogCreator.LogEntry( "WallCut Failed on " 
+                + elemHost.Id.ToString() );
             }
           }
 
@@ -58,7 +60,11 @@ namespace SpatialElementGeometryCalculator
 
           if( !openingArea.Equals( 0 ) )
           {
-            LogCreator.LogEntry( ";_______OPENINGAREA;" + elemInsert.Id.ToString() + ";" + elemInsert.Category.Name + ";" + elemInsert.Name + ";" + ( openingArea * 0.09290304 ).ToString() );
+            LogCreator.LogEntry( ";_______OPENINGAREA;" 
+              + elemInsert.Id.ToString() + ";" 
+              + elemInsert.Category.Name + ";" 
+              + elemInsert.Name + ";" 
+              + ( openingArea * 0.09290304 ).ToString() );
           }
           return openingArea;
         }
@@ -66,15 +72,20 @@ namespace SpatialElementGeometryCalculator
 
       if( elemInsert is Wall )
       {
-        return solidHandlers.GetWallAsOpeningArea( elemInsert, roomSolid );
+        return solidHandler.GetWallAsOpeningArea( 
+          elemInsert, roomSolid );
       }
+
       return openingArea;
     }
 
-    public double GetWallCutArea( Document doc, FamilyInstance fi, Wall wall, bool isStacked )
+    public double GetWallCutArea( 
+      Document doc, 
+      FamilyInstance fi, 
+      Wall wall, 
+      bool isStacked )
     {
-
-      Autodesk.Revit.DB.Options optCompRef = doc.Application.Create.NewGeometryOptions();
+      Options optCompRef = doc.Application.Create.NewGeometryOptions();
 
       if( null != optCompRef )
       {
@@ -87,7 +98,10 @@ namespace SpatialElementGeometryCalculator
 
       if( !isStacked )
       {
-        CurveLoop curveLoop = ExporterIFCUtils.GetInstanceCutoutFromWall( fi.Document, wall, fi, out cutDir );
+        CurveLoop curveLoop 
+          = ExporterIFCUtils.GetInstanceCutoutFromWall( 
+            fi.Document, wall, fi, out cutDir );
+
         IList<CurveLoop> loops = new List<CurveLoop>( 1 );
         loops.Add( curveLoop );
 
@@ -96,25 +110,39 @@ namespace SpatialElementGeometryCalculator
 
       else if( isStacked )
       {
-        CurveLoop curveLoop = ExporterIFCUtils.GetInstanceCutoutFromWall( fi.Document, wall, fi, out cutDir );
+        CurveLoop curveLoop 
+          = ExporterIFCUtils.GetInstanceCutoutFromWall( 
+            fi.Document, wall, fi, out cutDir );
+
         IList<CurveLoop> loops = new List<CurveLoop>( 1 );
         loops.Add( curveLoop );
 
-        GeometryElement geomElemHost = wall.get_Geometry( optCompRef ) as GeometryElement;
-        Solid solidOpening = GeometryCreationUtilities.CreateExtrusionGeometry( loops, cutDir.Negate(), .1 );
-        Solid solidHost = solHandler.CreateSolidFromBoundingBox( null, geomElemHost.GetBoundingBox(), null );
+        GeometryElement geomElemHost = wall.get_Geometry( 
+          optCompRef ) as GeometryElement;
+
+        Solid solidOpening 
+          = GeometryCreationUtilities.CreateExtrusionGeometry( 
+            loops, cutDir.Negate(), .1 );
+
+        Solid solidHost = solHandler.CreateSolidFromBoundingBox( 
+          null, geomElemHost.GetBoundingBox(), null );
 
         if( solidHost == null )
         {
           return 0;
         }
 
-        Solid intersectSolid = BooleanOperationsUtils.ExecuteBooleanOperation( solidOpening, solidHost, BooleanOperationsType.Intersect );
+        Solid intersectSolid 
+          = BooleanOperationsUtils.ExecuteBooleanOperation( 
+            solidOpening, solidHost, BooleanOperationsType.Intersect );
 
         if( intersectSolid.Faces.Size.Equals( 0 ) )
         {
-          solidOpening = GeometryCreationUtilities.CreateExtrusionGeometry( loops, cutDir, .1 );
-          intersectSolid = BooleanOperationsUtils.ExecuteBooleanOperation( solidOpening, solidHost, BooleanOperationsType.Intersect );
+          solidOpening = GeometryCreationUtilities.CreateExtrusionGeometry( 
+            loops, cutDir, .1 );
+
+          intersectSolid = BooleanOperationsUtils.ExecuteBooleanOperation( 
+            solidOpening, solidHost, BooleanOperationsType.Intersect );
         }
 
         if( DebugHandler.EnableSolidUtilityVolumes )
@@ -129,7 +157,9 @@ namespace SpatialElementGeometryCalculator
       return 0;
     }
 
-    private static bool IsToOrFromThisRoom( Room room, FamilyInstance fi )
+    private static bool IsToOrFromThisRoom( 
+      Room room, 
+      FamilyInstance fi )
     {
       bool isInRoom = false;
 
@@ -156,9 +186,12 @@ namespace SpatialElementGeometryCalculator
       return isInRoom;
     }
 
-    private static double GetDoorWinAreaFromParameter( Document doc, FamilyInstance insert )
+    private static double GetDoorWinAreaFromParameter( 
+      Document doc, 
+      FamilyInstance insert )
     {
-      ElementType insertType = doc.GetElement( insert.GetTypeId() ) as ElementType;
+      ElementType insertType = doc.GetElement( insert.GetTypeId() ) 
+        as ElementType;
 
       double openingArea = 0;
 
