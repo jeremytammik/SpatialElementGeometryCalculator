@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 
 namespace SpatialElementGeometryCalculator
 {
@@ -12,70 +9,25 @@ namespace SpatialElementGeometryCalculator
       Solid transientSolid,
       string dsName )
     {
-      //ElementId idMaterial
-      //  = new FilteredElementCollector( doc )
-      //   .OfClass( typeof( Material ) )
-      //   .FirstOrDefault()
-      //   .Id;
+      ElementId catId = new ElementId( 
+        BuiltInCategory.OST_GenericModel );
 
-      //GraphicsStyle style
-      //  = new FilteredElementCollector( doc )
-      //    .OfClass( typeof( GraphicsStyle ) )
-      //  .Cast<GraphicsStyle>()
-      //  .FirstOrDefault<GraphicsStyle>(
-      //    gs => gs.Name.Equals( "Walls" ) );
+      AddInId addInId = doc.Application.ActiveAddInId;
 
-      //ElementId idGraphicsStyle = null;
+      DirectShape ds 
+        = DirectShape.CreateElement( doc, catId, 
+          addInId.GetGUID().ToString(), "" );
 
-      //if( style != null )
-      //{
-      //  idGraphicsStyle = style.Id;
-      //}
-      //else
-      //{
-      //  LogCreator.LogEntry( "Cant create DirectShape because the Graphic Style was not found." );
-      //  return null;
-      //}
-
-      try
+      if( ds.IsValidGeometry( transientSolid ) )
       {
-        ElementId catId = new ElementId( BuiltInCategory.OST_GenericModel );
-        DirectShape dsUtilityVolume = DirectShape.CreateElement( doc, catId, "06713861-8D80-4BCE-9B42-657695D45DC8", "" );
-
-        bool isValid = dsUtilityVolume.IsValidGeometry( transientSolid );
-
-        if( isValid )
-        {
-          dsUtilityVolume.SetShape( new GeometryObject[] { transientSolid } );
-        }
-        else
-        {
-          return null;
-        }
-
-        dsUtilityVolume.Name = dsName;
-
-        return dsUtilityVolume;
+        ds.SetShape( new GeometryObject[] { transientSolid } );
+        ds.Name = dsName;
       }
-      catch
+      else
       {
-        LogCreator.LogEntry( "DirectShape creation failed." );
-        return null;
+        ds = null;
       }
+      return ds;
     }
-
-    //public static IList<GeometryObject> CreateMeshesFromSolid(Solid solid)
-    //{
-    //    IList<GeometryObject> triangulations = new List<GeometryObject>();
-
-    //    foreach (Face face in solid.Faces)
-    //    {
-    //        Mesh faceMesh = face.Triangulate();
-    //        if (faceMesh != null && faceMesh.NumTriangles > 0)
-    //            triangulations.Add(faceMesh);
-    //    }
-
-    //    return triangulations;
-    //}
   }
 }
