@@ -10,224 +10,162 @@ namespace SpatialElementGeometryCalculator
 {
   class OpeningHandler
   {
-    public double GetOpeningArea( 
-      SolidHandler solidHandler, 
-      Element elemHost, 
-      Element elemInsert, 
-      Room room, 
-      Solid roomSolid, 
-      bool isStacked )
+    public double GetOpeningArea(
+      Wall elemHost,
+      Element elemInsert,
+      Room room,
+      Solid roomSolid )
     {
       Document doc = room.Document;
       double openingArea = 0;
-
-      Parameter demoInsert = elemInsert.get_Parameter( 
-        BuiltInParameter.PHASE_DEMOLISHED ) as Parameter;
-
-      if( demoInsert != null )
-      {
-        if( !demoInsert.AsValueString().Equals( "None" ) )
-        {
-          return openingArea;
-        }
-      }
 
       if( elemInsert is FamilyInstance )
       {
         FamilyInstance fi = elemInsert as FamilyInstance;
 
-        if( IsToOrFromThisRoom( room, fi ) )
+        if( IsInRoom( room, fi ) )
         {
           if( elemHost is Wall )
           {
-            try
-            {
-              Wall wall = elemHost as Wall;
-              openingArea = GetWallCutArea( doc, fi, wall, isStacked );
-            }
-            catch
-            {
-              openingArea = 0;
-              LogCreator.LogEntry( "WallCut Failed on " 
-                + elemHost.Id.ToString() );
-            }
+            Wall wall = elemHost as Wall;
+            openingArea = GetWallCutArea( fi, wall );
           }
 
-          if( openingArea.Equals( 0 ) )
-          {
-            openingArea = GetDoorWinAreaFromParameter( doc, fi );
-          }
-
-          if( !openingArea.Equals( 0 ) )
-          {
-            LogCreator.LogEntry( ";_______OPENINGAREA;" 
-              + elemInsert.Id.ToString() + ";" 
-              + elemInsert.Category.Name + ";" 
-              + elemInsert.Name + ";" 
-              + ( openingArea * 0.09290304 ).ToString() );
-          }
-          return openingArea;
+          //if( openingArea.Equals( 0 ) )
+          //{
+          //  openingArea = GetDoorWinAreaFromParameter( doc, fi );
+          //}
         }
       }
 
       if( elemInsert is Wall )
       {
-        return solidHandler.GetWallAsOpeningArea( 
+        SolidHandler solidHandler = new SolidHandler();
+        openingArea = solidHandler.GetWallAsOpeningArea( 
           elemInsert, roomSolid );
       }
-
       return openingArea;
     }
 
     public double GetWallCutArea( 
-      Document doc, 
       FamilyInstance fi, 
-      Wall wall, 
-      bool isStacked )
+      Wall wall )
     {
-      Options optCompRef 
-        = doc.Application.Create.NewGeometryOptions();
+      Document doc = fi.Document;
 
-      if( null != optCompRef )
-      {
-        optCompRef.ComputeReferences = true;
-        optCompRef.DetailLevel = ViewDetailLevel.Medium;
-      }
-
-      SolidHandler solHandler = new SolidHandler();
       XYZ cutDir = null;
 
-      if( !isStacked )
+      CurveLoop curveLoop 
+        = ExporterIFCUtils.GetInstanceCutoutFromWall( 
+          fi.Document, wall, fi, out cutDir );
+
+      IList<CurveLoop> loops = new List<CurveLoop>( 1 );
+      loops.Add( curveLoop );
+
+      if( !wall.IsStackedWallMember )
       {
-        CurveLoop curveLoop 
-          = ExporterIFCUtils.GetInstanceCutoutFromWall( 
-            fi.Document, wall, fi, out cutDir );
-
-        IList<CurveLoop> loops = new List<CurveLoop>( 1 );
-        loops.Add( curveLoop );
-
-        return ExporterIFCUtils.ComputeAreaOfCurveLoops( 
-          loops );
+        return ExporterIFCUtils.ComputeAreaOfCurveLoops( loops );
       }
-
-      else if( isStacked )
+      else
       {
-        CurveLoop curveLoop 
-          = ExporterIFCUtils.GetInstanceCutoutFromWall( 
-            fi.Document, wall, fi, out cutDir );
+        // Will not get multiple stacked walls with 
+        // varying thickness due to the nature of rooms.
+        // Use ReferenceIntersector if we can identify 
+        // those missing room faces...open for suggestions.
 
-        IList<CurveLoop> loops = new List<CurveLoop>( 1 );
-        loops.Add( curveLoop );
+        SolidHandler solHandler = new SolidHandler();
+        Options optCompRef 
+          = doc.Application.Create.NewGeometryOptions();
+        if( null != optCompRef )
+        {
+          optCompRef.ComputeReferences = true;
+          optCompRef.DetailLevel = ViewDetailLevel.Medium;
+        }
 
-        GeometryElement geomElemHost = wall.get_Geometry( 
-          optCompRef ) as GeometryElement;
+        GeometryElement geomElemHost 
+          = wall.get_Geometry( optCompRef ) 
+            as GeometryElement;
 
-        Solid solidOpening 
-          = GeometryCreationUtilities.CreateExtrusionGeometry( 
-            loops, cutDir.Negate(), .1 );
+        Solid solidOpening = GeometryCreationUtilities
+          .CreateExtrusionGeometry( loops, 
+            cutDir.Negate(), .1 );
 
-        Solid solidHost = solHandler.CreateSolidFromBoundingBox( 
-          null, geomElemHost.GetBoundingBox(), null );
+        Solid solidHost 
+          = solHandler.CreateSolidFromBoundingBox( 
+            null, geomElemHost.GetBoundingBox(), null );
+
+        // We dont really care about the boundingbox 
+        // rotation as we only need the intersected solid.
 
         if( solidHost == null )
         {
           return 0;
         }
 
-        Solid intersectSolid 
-          = BooleanOperationsUtils.ExecuteBooleanOperation( 
-            solidOpening, solidHost, 
-            BooleanOperationsType.Intersect );
+        Solid intersectSolid = BooleanOperationsUtils
+          .ExecuteBooleanOperation( solidOpening, 
+            solidHost, BooleanOperationsType.Intersect );
 
         if( intersectSolid.Faces.Size.Equals( 0 ) )
         {
-          solidOpening 
-            = GeometryCreationUtilities.CreateExtrusionGeometry( 
-              loops, cutDir, .1 );
+          solidOpening = GeometryCreationUtilities
+            .CreateExtrusionGeometry( loops, cutDir, .1 );
 
-          intersectSolid 
-            = BooleanOperationsUtils.ExecuteBooleanOperation( 
-              solidOpening, solidHost, 
-              BooleanOperationsType.Intersect );
+          intersectSolid = BooleanOperationsUtils
+            .ExecuteBooleanOperation( solidOpening, 
+              solidHost, BooleanOperationsType.Intersect );
         }
 
         if( DebugHandler.EnableSolidUtilityVolumes )
         {
-          using( Transaction trans = new Transaction( doc ) )
+          using( Transaction t = new Transaction( doc ) )
           {
-            trans.Start( "stacked1" );
+            t.Start( "Stacked1" );
             ShapeCreator.CreateDirectShape( doc, 
               intersectSolid, "stackedOpening" );
-            trans.Commit();
+            t.Commit();
           }
         }
-        return solHandler.GetLargestFaceArea( intersectSolid );
+        return solHandler.GetLargestFaceArea( 
+          intersectSolid );
       }
-      return 0;
     }
 
-    private static bool IsToOrFromThisRoom( 
-      Room room, 
-      FamilyInstance fi )
+    /// <summary>
+    /// Predicate to determine whether the given 
+    /// family instance belongs to the given room.
+    /// </summary>
+    static bool IsInRoom(
+      Room room,
+      FamilyInstance f )
     {
-      bool isInRoom = false;
-
-      if( fi.Room != null )
-      {
-        if( fi.Room.Id == room.Id )
-        {
-          return true;
-        }
-      }
-
-      if( fi.ToRoom != null )
-      {
-        isInRoom = fi.ToRoom.Id.Equals( room.Id );
-      }
-
-      if( !isInRoom )
-      {
-        if( fi.FromRoom != null )
-        {
-          isInRoom = fi.FromRoom.Id.Equals( room.Id );
-        }
-      }
-      return isInRoom;
+      ElementId id = room.Id;
+      return ( ( f.Room != null && f.Room.Id == id )
+        || ( f.ToRoom != null && f.ToRoom.Id == id )
+        || ( f.FromRoom != null && f.FromRoom.Id == id ) );
     }
 
-    private static double GetDoorWinAreaFromParameter( 
-      Document doc, 
-      FamilyInstance insert )
+
+    //private static double GetDoorWinAreaFromParameter( Document doc, FamilyInstance insert )
+    //{
+    //  ElementType insertType = doc.GetElement( insert.GetTypeId() ) as ElementType;
+
+    //  //This is somewhat problematic as some familys use Height and some Rough Height.
+    //  //Or completely different parameters and in some cases not connected to the family geometry at all.
+    //  //A solid intersection with the room is probably the surest thing
+    //  Parameter height = insertType.get_Parameter(BuiltInParameter.FAMILY_HEIGHT_PARAM);
+    //  Parameter width = insertType.get_Parameter(BuiltInParameter.FAMILY_WIDTH_PARAM);
+
+    //  return width.AsDouble() * height.AsDouble();
+    //}
+
+    private static Solid GetLargestSolid( 
+      GeometryElement geomElem )
     {
-      ElementType insertType = doc.GetElement( insert.GetTypeId() ) 
-        as ElementType;
+      // Not correct if the wall is very thick or 
+      // opening is unusually narrow though this 
+      // should be quite rare.
 
-      double openingArea = 0;
-
-      //check instance first then type
-      Parameter height = insert.get_Parameter( BuiltInParameter.FAMILY_HEIGHT_PARAM );
-      Parameter width = insert.get_Parameter( BuiltInParameter.FAMILY_WIDTH_PARAM );
-
-      if( width != null && height != null )
-      {
-        openingArea = width.AsDouble() * height.AsDouble();
-      }
-
-      if( openingArea.Equals( 0 ) )
-      {
-        width = insertType.get_Parameter( BuiltInParameter.FAMILY_WIDTH_PARAM );
-        height = insertType.get_Parameter( BuiltInParameter.FAMILY_HEIGHT_PARAM );
-      }
-
-      if( width != null && height != null )
-      {
-        openingArea = width.AsDouble() * height.AsDouble();
-      }
-      return openingArea;
-    }
-
-    private static Solid GetLargestSolid( GeometryElement geomElem )
-    {
       IList<Solid> lstHostSolids = new List<Solid>();
       Solid solidMax = null;
       IList<double> lstVolumes = new List<double>();

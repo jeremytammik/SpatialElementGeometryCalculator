@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration( "" )]
 [assembly: AssemblyCompany( "Autodesk Inc." )]
 [assembly: AssemblyProduct( "SpatialElementGeometryCalculator" )]
-[assembly: AssemblyCopyright( "Copyright 2015 (C) Phillip Miller, Kiwi Codes Solutions Ltd., Jeremy Tammik, Autodesk Inc., Hakon Clausen" )]
+[assembly: AssemblyCopyright( "Copyright 2015-2016 (C) Phillip Miller, Kiwi Codes Solutions Ltd., Jeremy Tammik, Autodesk Inc., Hakon Clausen, Håvard Dagsvik" )]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
 
@@ -41,6 +41,7 @@ using System.Runtime.InteropServices;
 // 2015-12-03 2016.0.0.0 flat migration to Revit 2016 - zero changes, zero errors, zero warnings
 // 2016-04-08 2016.0.0.1 integrated added OpeningHandler.cs by Håvard Dagsvik
 // 2016-04-08 2016.0.0.2 cleanup but not yet tested
+// 2016-04-13 2016.0.0.3 integrated testing code by Håvard Dagsvik
 //
-[assembly: AssemblyVersion( "2016.0.0.2" )]
-[assembly: AssemblyFileVersion( "2016.0.0.2" )]
+[assembly: AssemblyVersion( "2016.0.0.3" )]
+[assembly: AssemblyFileVersion( "2016.0.0.3" )]

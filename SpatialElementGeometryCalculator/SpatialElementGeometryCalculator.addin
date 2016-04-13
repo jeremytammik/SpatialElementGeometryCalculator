@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RevitAddIns>
   <AddIn Type="Command">
-    <Text>Command SpatialElementGeometryCalculator</Text>
-    <Description>Some description for SpatialElementGeometryCalculator</Description>
+    <Text>Spatial Element Geometry Calculator</Text>
+    <Description>Test SpatialElementGeometryCalculator</Description>
     <Assembly>SpatialElementGeometryCalculator.dll</Assembly>
     <FullClassName>SpatialElementGeometryCalculator.Command</FullClassName>
     <ClientId>7a754d40-af7b-49d7-b37e-b0fb594d2a42</ClientId>

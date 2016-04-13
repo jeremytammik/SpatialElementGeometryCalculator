@@ -1,6 +1,7 @@
-#region
+#region Namespaces
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
@@ -12,94 +13,204 @@ namespace SpatialElementGeometryCalculator
   [Transaction( TransactionMode.Manual )]
   public class Command : IExternalCommand
   {
-    const BuiltInParameter _bipRoomNr = BuiltInParameter.ROOM_NUMBER;
-    const BuiltInParameter _bipMark = BuiltInParameter.ALL_MODEL_MARK;
-
     public Result Execute(
       ExternalCommandData commandData,
       ref string message,
       ElementSet elements )
     {
-      var app = commandData.Application;
-      var doc = app.ActiveUIDocument.Document;
+      UIApplication uiapp = commandData.Application;
+      Document doc = uiapp.ActiveUIDocument.Document;
       Result rc;
-      string s = string.Empty;
+
       try
       {
-        var roomIds = new FilteredElementCollector( doc )
-          .OfClass( typeof( SpatialElement ) )
-          .ToElementIds();
+        ICollection<ElementId> roomIds
+          = new FilteredElementCollector( doc )
+            .OfClass( typeof( SpatialElement ) )
+            .ToElementIds();
+
+        List<string> compareWallAndRoom = new List<string>();
+        OpeningHandler openingHandler = new OpeningHandler();
+
+        List<SpatialBoundaryCache> lstSpatialBoundaryCache
+          = new List<SpatialBoundaryCache>();
 
         foreach( var id in roomIds )
         {
-          var room = doc.GetElement( id ) as Room;
+          Room room = doc.GetElement( id ) as Room;
+
           if( room == null ) continue;
           if( room.Location == null ) continue;
+          if( room.Area.Equals( 0 ) ) continue;
 
-          var sebOptions = new SpatialElementBoundaryOptions
-          {
-            SpatialElementBoundaryLocation
-            = SpatialElementBoundaryLocation.Finish
-          };
-          var calc = new Autodesk.Revit.DB
-            .SpatialElementGeometryCalculator(
-              doc, sebOptions );
+          SpatialElementBoundaryOptions sebOptions
+            = new SpatialElementBoundaryOptions
+            {
+              SpatialElementBoundaryLocation
+                = SpatialElementBoundaryLocation.Finish
+            };
 
-          var results = calc
-            .CalculateSpatialElementGeometry( room );
+          Autodesk.Revit.DB.SpatialElementGeometryCalculator calc =
+              new Autodesk.Revit.DB.SpatialElementGeometryCalculator(
+                doc, sebOptions );
 
-          // Keep track of each wall and 
-          // its total area in the room.
+          SpatialElementGeometryResults results
+            = calc.CalculateSpatialElementGeometry(
+              room );
 
-          var walls = new Dictionary<string, double>();
+          Solid roomSolid = results.GetGeometry();
 
           foreach( Face face in results.GetGeometry().Faces )
           {
-            foreach( var subface in results
-              .GetBoundaryFaceInfo( face ) )
+            IList<SpatialElementBoundarySubface> boundaryFaceInfo
+              = results.GetBoundaryFaceInfo( face );
+
+            foreach( var spatialSubFace in boundaryFaceInfo )
             {
-              if( subface.SubfaceType
-                != SubfaceType.Side ) { continue; }
+              if( spatialSubFace.SubfaceType
+                != SubfaceType.Side )
+              {
+                continue;
+              }
 
-              var wall = doc.GetElement( subface
+              SpatialBoundaryCache spatialData
+                = new SpatialBoundaryCache();
+
+              Wall wall = doc.GetElement( spatialSubFace
                 .SpatialBoundaryElement.HostElementId )
-                  as HostObject;
+                  as Wall;
 
-              if( wall == null ) { continue; }
-              var grossArea = subface.GetSubface().Area;
-              if( !walls.ContainsKey( wall.UniqueId ) )
+              if( wall == null )
               {
-                walls.Add( wall.UniqueId, grossArea );
+                continue;
               }
-              else
+
+              WallType wallType = doc.GetElement(
+                wall.GetTypeId() ) as WallType;
+
+              if( wallType.Kind == WallKind.Curtain )
               {
-                walls[wall.UniqueId] += grossArea;
+                // Leave out as curtain walls is not painted.
+
+                LogCreator.LogEntry( "WallType is CurtainWall" );
+
+                continue;
               }
-            }
-          }
 
-          foreach( var id2 in walls.Keys )
-          {
-            var wall = (HostObject) doc.GetElement( id2 );
+              HostObject hostObject = wall as HostObject;
 
-            var openings = CalculateWallOpeningArea(
-              wall, room );
+              IList<ElementId> insertsThisHost
+                = hostObject.FindInserts(
+                  true, false, true, true );
 
-            s += string.Format(
-              "Room: {0} Wall: {1} Area: {2} m2\r\n",
-              room.get_Parameter( _bipRoomNr ).AsString(),
-              wall.get_Parameter( _bipMark ).AsString(),
-              SqFootToSquareM( walls[id2] - openings ) );
-          }
+              double openingArea = 0;
+
+              foreach( ElementId idInsert in insertsThisHost )
+              {
+                string countOnce = room.Id.ToString()
+                  + wall.Id.ToString() + idInsert.ToString();
+
+                if( !compareWallAndRoom.Contains( countOnce ) )
+                {
+                  Element elemOpening = doc.GetElement(
+                    idInsert ) as Element;
+
+                  openingArea = openingArea
+                    + openingHandler.GetOpeningArea(
+                      wall, elemOpening, room, roomSolid );
+
+                  compareWallAndRoom.Add( countOnce );
+                }
+              }
+
+              // Cache SpatialElementBoundarySubface info.
+
+              spatialData.roomName = room.Name;
+              spatialData.idElement = wall.Id;
+              spatialData.idMaterial = spatialSubFace.GetBoundingElementFace().MaterialElementId;
+              spatialData.dblGrossArea = Util.sqFootToSquareM( spatialSubFace.GetSubface().Area );
+              spatialData.dblOpeningArea = Util.sqFootToSquareM( openingArea );
+              lstSpatialBoundaryCache.Add( spatialData );
+
+            } // end foreach Subface from which roombounding elements are derived
+
+          } // end foreach Face
+
+        } // end foreach Room
+
+        string t = string.Empty;
+
+        List<SpatialBoundaryCache> groupedData
+          = SortByRoom( lstSpatialBoundaryCache );
+
+        foreach( SpatialBoundaryCache sbc in groupedData )
+        {
+          t += sbc.roomName + "; "
+            + "WallTypes could vary; GrossArea: " + sbc.dblGrossArea.ToString()
+            + "; OpeningArea: " + sbc.dblOpeningArea.ToString()
+            + "; NetArea: " + ( sbc.dblGrossArea - sbc.dblOpeningArea ).ToString()
+            + System.Environment.NewLine;
         }
-        
-        TaskDialog.Show( "Room Wall Areas", s );
+
+        System.Windows.Forms.MessageBox.Show( t,
+          "Total Net Area in m2 by Room" );
+
+        t = string.Empty;
+
+        groupedData = SortByRoomAndWallType(
+          lstSpatialBoundaryCache );
+
+        foreach( SpatialBoundaryCache sbc in groupedData )
+        {
+          Element elemWall = doc.GetElement(
+            sbc.idElement ) as Element;
+
+          t += sbc.roomName + "; "
+            + elemWall.Name + "(" + sbc.idElement.ToString()
+            + "); GrossArea: " + sbc.dblGrossArea.ToString()
+            + "; OpeningArea: " + sbc.dblOpeningArea.ToString()
+            + "; NetArea: " + ( sbc.dblGrossArea - sbc.dblOpeningArea ).ToString()
+            + System.Environment.NewLine;
+        }
+
+        System.Windows.Forms.MessageBox.Show( t,
+          "Net Area in m2 by Wall Type" );
+
+        t = string.Empty;
+
+        groupedData = SortByRoomAndMaterial(
+          lstSpatialBoundaryCache );
+
+        foreach( SpatialBoundaryCache sbc in groupedData )
+        {
+          string materialName = string.Empty;
+
+          if( sbc.idMaterial == ElementId.InvalidElementId )
+          {
+            materialName = "No material";
+          }
+          else
+          {
+            Element material = doc.GetElement( sbc.idMaterial ) as Element;
+            materialName = material.Name;
+          }
+
+          double netArea = sbc.dblGrossArea - sbc.dblOpeningArea;
+          t += sbc.roomName + "; "
+            + materialName + "; GrossArea: "
+            + sbc.dblGrossArea.ToString() + "; OpeningArea: "
+            + sbc.dblOpeningArea.ToString() + "; NetArea: "
+            + netArea.ToString() + System.Environment.NewLine;
+        }
+
+        System.Windows.Forms.MessageBox.Show( t,
+          "Net Area in m2 by Outer Layer Material" );
 
         rc = Result.Succeeded;
       }
       catch( Exception ex )
       {
-        TaskDialog.Show( "Room Wall Areas",
+        TaskDialog.Show( "Room Boundaries",
           ex.Message + "\r\n" + ex.StackTrace );
 
         rc = Result.Failed;
@@ -116,52 +227,66 @@ namespace SpatialElementGeometryCalculator
       return Math.Round( sqFoot * 0.092903, 2 );
     }
 
-    /// <summary>
-    /// Calculate wall area minus openings. Temporarily
-    /// delete all openings in a transaction that is
-    /// rolled back.
-    /// </summary>
-    static double CalculateWallOpeningArea(
-      HostObject wall,
-      Room room )
+    private List<SpatialBoundaryCache> SortByRoom(
+      List<SpatialBoundaryCache> lstRawData )
     {
-      var doc = wall.Document;
-      var wallAreaNet = wall.get_Parameter(
-        BuiltInParameter.HOST_AREA_COMPUTED ).AsDouble();
+      var sortedCache
+        = from rawData in lstRawData
+          group rawData by new { room = rawData.roomName }
+            into sortedData
+            select new SpatialBoundaryCache()
+            {
+              roomName = sortedData.Key.room,
+              idElement = ElementId.InvalidElementId,
+              dblGrossArea = sortedData.Sum( x => x.dblGrossArea ),
+              dblOpeningArea = sortedData.Sum( y => y.dblOpeningArea ),
+            };
 
-      var t = new Transaction( doc );
-      t.Start( "Temp" );
-      foreach( var id in wall.FindInserts(
-        true, true, true, true ) )
-      {
-        var insert = doc.GetElement( id );
-        if( insert is FamilyInstance
-          && IsInRoom( room, (FamilyInstance) insert ) )
-        {
-          doc.Delete( id );
-        }
-      }
-
-      doc.Regenerate();
-      var wallAreaGross = wall.get_Parameter(
-        BuiltInParameter.HOST_AREA_COMPUTED ).AsDouble();
-      t.RollBack();
-
-      return wallAreaGross - wallAreaNet;
+      return sortedCache.ToList();
     }
 
-    /// <summary>
-    /// Predicate to determine whether the given 
-    /// family instance belongs to the given room.
-    /// </summary>
-    static bool IsInRoom(
-      Room room,
-      FamilyInstance f )
+    private List<SpatialBoundaryCache> SortByRoomAndWallType(
+      List<SpatialBoundaryCache> lstRawData )
     {
-      ElementId id = room.Id;
-      return ( ( f.Room != null && f.Room.Id == id )
-        || ( f.ToRoom != null && f.ToRoom.Id == id )
-        || ( f.FromRoom != null && f.FromRoom.Id == id ) );
+      var sortedCache
+        = from rawData in lstRawData
+          group rawData by new
+          {
+            room = rawData.roomName,
+            wallid = rawData.idElement
+          }
+            into sortedData
+            select new SpatialBoundaryCache()
+            {
+              roomName = sortedData.Key.room,
+              idElement = sortedData.Key.wallid,
+              dblGrossArea = sortedData.Sum( x => x.dblGrossArea ),
+              dblOpeningArea = sortedData.Sum( y => y.dblOpeningArea ),
+            };
+
+      return sortedCache.ToList();
+    }
+
+    private List<SpatialBoundaryCache> SortByRoomAndMaterial(
+      List<SpatialBoundaryCache> lstRawData )
+    {
+      var sortedCache
+        = from rawData in lstRawData
+          group rawData by new
+          {
+            room = rawData.roomName,
+            mid = rawData.idMaterial
+          }
+            into sortedData
+            select new SpatialBoundaryCache()
+            {
+              roomName = sortedData.Key.room,
+              idMaterial = sortedData.Key.mid,
+              dblGrossArea = sortedData.Sum( x => x.dblGrossArea ),
+              dblOpeningArea = sortedData.Sum( y => y.dblOpeningArea ),
+            };
+
+      return sortedCache.ToList();
     }
   }
 }
