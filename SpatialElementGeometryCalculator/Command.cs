@@ -152,8 +152,8 @@ namespace SpatialElementGeometryCalculator
             + System.Environment.NewLine;
         }
 
-        System.Windows.Forms.MessageBox.Show( t,
-          "Total Net Area in m2 by Room" );
+        Util.InfoMsg2( "Total Net Area in m2 by Room", 
+          t );
 
         t = string.Empty;
 
@@ -173,8 +173,8 @@ namespace SpatialElementGeometryCalculator
             + System.Environment.NewLine;
         }
 
-        System.Windows.Forms.MessageBox.Show( t,
-          "Net Area in m2 by Wall Type" );
+        Util.InfoMsg2( "Net Area in m2 by Wall Type", 
+          t );
 
         t = string.Empty;
 
@@ -203,8 +203,9 @@ namespace SpatialElementGeometryCalculator
             + netArea.ToString() + System.Environment.NewLine;
         }
 
-        System.Windows.Forms.MessageBox.Show( t,
-          "Net Area in m2 by Outer Layer Material" );
+        Util.InfoMsg2( 
+          "Net Area in m2 by Outer Layer Material", 
+          t );
 
         rc = Result.Succeeded;
       }
@@ -227,7 +228,7 @@ namespace SpatialElementGeometryCalculator
       return Math.Round( sqFoot * 0.092903, 2 );
     }
 
-    private List<SpatialBoundaryCache> SortByRoom(
+    List<SpatialBoundaryCache> SortByRoom(
       List<SpatialBoundaryCache> lstRawData )
     {
       var sortedCache
@@ -245,7 +246,7 @@ namespace SpatialElementGeometryCalculator
       return sortedCache.ToList();
     }
 
-    private List<SpatialBoundaryCache> SortByRoomAndWallType(
+    List<SpatialBoundaryCache> SortByRoomAndWallType(
       List<SpatialBoundaryCache> lstRawData )
     {
       var sortedCache
@@ -267,7 +268,7 @@ namespace SpatialElementGeometryCalculator
       return sortedCache.ToList();
     }
 
-    private List<SpatialBoundaryCache> SortByRoomAndMaterial(
+    List<SpatialBoundaryCache> SortByRoomAndMaterial(
       List<SpatialBoundaryCache> lstRawData )
     {
       var sortedCache

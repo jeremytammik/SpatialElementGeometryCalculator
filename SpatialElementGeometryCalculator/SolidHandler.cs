@@ -136,7 +136,7 @@ namespace SpatialElementGeometryCalculator
 
     const double _offset = 0;
 
-    private static bool GetProfile( 
+    static bool GetProfile( 
       List<List<XYZ>> polygons, 
       Solid solid, 
       XYZ v, 

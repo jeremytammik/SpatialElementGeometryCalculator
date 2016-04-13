@@ -146,7 +146,7 @@ namespace SpatialElementGeometryCalculator
     }
 
 
-    //private static double GetDoorWinAreaFromParameter( Document doc, FamilyInstance insert )
+    //static double GetDoorWinAreaFromParameter( Document doc, FamilyInstance insert )
     //{
     //  ElementType insertType = doc.GetElement( insert.GetTypeId() ) as ElementType;
 
@@ -159,7 +159,7 @@ namespace SpatialElementGeometryCalculator
     //  return width.AsDouble() * height.AsDouble();
     //}
 
-    private static Solid GetLargestSolid( 
+    static Solid GetLargestSolid( 
       GeometryElement geomElem )
     {
       // Not correct if the wall is very thick or 
