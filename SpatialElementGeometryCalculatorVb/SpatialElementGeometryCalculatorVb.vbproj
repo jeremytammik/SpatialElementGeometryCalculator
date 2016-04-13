@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{DA814943-2365-41EE-9CA1-FBA62B0DD8F2}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SpatialElementGeometryCalculator</RootNamespace>
-    <AssemblyName>SpatialElementGeometryCalculator</AssemblyName>
+    <RootNamespace>SpatialElementGeometryCalculatorVb</RootNamespace>
+    <AssemblyName>SpatialElementGeometryCalculatorVb</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -18,7 +18,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>SpatialElementGeometryCalculator.xml</DocumentationFile>
+    <DocumentationFile>SpatialElementGeometryCalculatorVb.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -27,7 +27,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>SpatialElementGeometryCalculator.xml</DocumentationFile>
+    <DocumentationFile>SpatialElementGeometryCalculatorVb.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
