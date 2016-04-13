@@ -8,7 +8,7 @@ namespace SpatialElementGeometryCalculator
     public string roomName;
     public ElementId idElement;
     public ElementId idMaterial;
-    public double dblGrossArea;
+    public double dblNetArea;
     public double dblOpeningArea;
 
     public string AreaReport
@@ -17,8 +17,8 @@ namespace SpatialElementGeometryCalculator
       {
         return string.Format(
           "net {0}; opening {1}; gross {2}",
-          dblGrossArea, dblOpeningArea, 
-          dblGrossArea + dblOpeningArea );
+          dblNetArea, dblOpeningArea, 
+          dblNetArea + dblOpeningArea );
       }
     }
   }
