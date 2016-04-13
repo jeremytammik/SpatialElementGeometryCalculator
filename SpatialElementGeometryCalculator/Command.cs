@@ -26,14 +26,16 @@ namespace SpatialElementGeometryCalculator
       try
       {
         SpatialElementBoundaryOptions sebOptions
-          = new SpatialElementBoundaryOptions {
+          = new SpatialElementBoundaryOptions
+          {
             SpatialElementBoundaryLocation
-              = SpatialElementBoundaryLocation.Finish };
+              = SpatialElementBoundaryLocation.Finish
+          };
 
         IEnumerable<Element> rooms
           = new FilteredElementCollector( doc )
             .OfClass( typeof( SpatialElement ) )
-            .Where<Element>( e => (e is Room) );
+            .Where<Element>( e => ( e is Room ) );
 
         List<string> compareWallAndRoom = new List<string>();
         OpeningHandler openingHandler = new OpeningHandler();
@@ -124,12 +126,16 @@ namespace SpatialElementGeometryCalculator
 
               spatialData.roomName = room.Name;
               spatialData.idElement = wall.Id;
-              spatialData.idMaterial = spatialSubFace.GetBoundingElementFace().MaterialElementId;
-              spatialData.dblNetArea = Util.sqFootToSquareM( spatialSubFace.GetSubface().Area );
-              spatialData.dblOpeningArea = Util.sqFootToSquareM( openingArea );
+              spatialData.idMaterial = spatialSubFace
+                .GetBoundingElementFace().MaterialElementId;
+              spatialData.dblNetArea = Util.sqFootToSquareM(
+                spatialSubFace.GetSubface().Area );
+              spatialData.dblOpeningArea = Util.sqFootToSquareM(
+                openingArea );
+
               lstSpatialBoundaryCache.Add( spatialData );
 
-            } // end foreach Subface from which roombounding elements are derived
+            } // end foreach subface from which room bounding elements are derived
 
           } // end foreach Face
 
@@ -142,13 +148,13 @@ namespace SpatialElementGeometryCalculator
 
         foreach( SpatialBoundaryCache sbc in groupedData )
         {
-          t.Add( sbc.roomName 
-            + "; all wall types and materials: " 
+          t.Add( sbc.roomName
+            + "; all wall types and materials: "
             + sbc.AreaReport );
         }
 
-        Util.InfoMsg2( "Total Net Area in m2 by Room", 
-          string.Join(System.Environment.NewLine, t ) );
+        Util.InfoMsg2( "Total Net Area in m2 by Room",
+          string.Join( System.Environment.NewLine, t ) );
 
         t.Clear();
 
@@ -160,8 +166,8 @@ namespace SpatialElementGeometryCalculator
           Element elemWall = doc.GetElement(
             sbc.idElement ) as Element;
 
-          t.Add( sbc.roomName + "; " + elemWall.Name 
-            + "(" + sbc.idElement.ToString() + "): " 
+          t.Add( sbc.roomName + "; " + elemWall.Name
+            + "(" + sbc.idElement.ToString() + "): "
             + sbc.AreaReport );
         }
 
@@ -175,16 +181,16 @@ namespace SpatialElementGeometryCalculator
 
         foreach( SpatialBoundaryCache sbc in groupedData )
         {
-          string materialName 
-            = (sbc.idMaterial == ElementId.InvalidElementId)
-              ? string.Empty 
+          string materialName
+            = ( sbc.idMaterial == ElementId.InvalidElementId )
+              ? string.Empty
               : doc.GetElement( sbc.idMaterial ).Name;
 
           t.Add( sbc.roomName + "; " + materialName + ": "
             + sbc.AreaReport );
         }
 
-        Util.InfoMsg2( 
+        Util.InfoMsg2(
           "Net Area in m2 by Outer Layer Material",
           string.Join( System.Environment.NewLine, t ) );
 
@@ -221,7 +227,8 @@ namespace SpatialElementGeometryCalculator
               roomName = sortedData.Key.room,
               idElement = ElementId.InvalidElementId,
               dblNetArea = sortedData.Sum( x => x.dblNetArea ),
-              dblOpeningArea = sortedData.Sum( y => y.dblOpeningArea ),
+              dblOpeningArea = sortedData.Sum(
+                y => y.dblOpeningArea ),
             };
 
       return sortedCache.ToList();
@@ -243,7 +250,8 @@ namespace SpatialElementGeometryCalculator
               roomName = sortedData.Key.room,
               idElement = sortedData.Key.wallid,
               dblNetArea = sortedData.Sum( x => x.dblNetArea ),
-              dblOpeningArea = sortedData.Sum( y => y.dblOpeningArea ),
+              dblOpeningArea = sortedData.Sum(
+                y => y.dblOpeningArea ),
             };
 
       return sortedCache.ToList();
@@ -265,7 +273,8 @@ namespace SpatialElementGeometryCalculator
               roomName = sortedData.Key.room,
               idMaterial = sortedData.Key.mid,
               dblNetArea = sortedData.Sum( x => x.dblNetArea ),
-              dblOpeningArea = sortedData.Sum( y => y.dblOpeningArea ),
+              dblOpeningArea = sortedData.Sum(
+                y => y.dblOpeningArea ),
             };
 
       return sortedCache.ToList();
