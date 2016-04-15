@@ -41,22 +41,22 @@ namespace SpatialElementGeometryCalculator
       if( elemInsert is Wall )
       {
         SolidHandler solidHandler = new SolidHandler();
-        openingArea = solidHandler.GetWallAsOpeningArea( 
+        openingArea = solidHandler.GetWallAsOpeningArea(
           elemInsert, roomSolid );
       }
       return openingArea;
     }
 
-    public double GetWallCutArea( 
-      FamilyInstance fi, 
+    public double GetWallCutArea(
+      FamilyInstance fi,
       Wall wall )
     {
       Document doc = fi.Document;
 
       XYZ cutDir = null;
 
-      CurveLoop curveLoop 
-        = ExporterIFCUtils.GetInstanceCutoutFromWall( 
+      CurveLoop curveLoop
+        = ExporterIFCUtils.GetInstanceCutoutFromWall(
           fi.Document, wall, fi, out cutDir );
 
       IList<CurveLoop> loops = new List<CurveLoop>( 1 );
@@ -74,7 +74,7 @@ namespace SpatialElementGeometryCalculator
         // those missing room faces...open for suggestions.
 
         SolidHandler solHandler = new SolidHandler();
-        Options optCompRef 
+        Options optCompRef
           = doc.Application.Create.NewGeometryOptions();
         if( null != optCompRef )
         {
@@ -82,16 +82,16 @@ namespace SpatialElementGeometryCalculator
           optCompRef.DetailLevel = ViewDetailLevel.Medium;
         }
 
-        GeometryElement geomElemHost 
-          = wall.get_Geometry( optCompRef ) 
+        GeometryElement geomElemHost
+          = wall.get_Geometry( optCompRef )
             as GeometryElement;
 
         Solid solidOpening = GeometryCreationUtilities
-          .CreateExtrusionGeometry( loops, 
+          .CreateExtrusionGeometry( loops,
             cutDir.Negate(), .1 );
 
-        Solid solidHost 
-          = solHandler.CreateSolidFromBoundingBox( 
+        Solid solidHost
+          = solHandler.CreateSolidFromBoundingBox(
             null, geomElemHost.GetBoundingBox(), null );
 
         // We dont really care about the boundingbox 
@@ -103,7 +103,7 @@ namespace SpatialElementGeometryCalculator
         }
 
         Solid intersectSolid = BooleanOperationsUtils
-          .ExecuteBooleanOperation( solidOpening, 
+          .ExecuteBooleanOperation( solidOpening,
             solidHost, BooleanOperationsType.Intersect );
 
         if( intersectSolid.Faces.Size.Equals( 0 ) )
@@ -112,7 +112,7 @@ namespace SpatialElementGeometryCalculator
             .CreateExtrusionGeometry( loops, cutDir, .1 );
 
           intersectSolid = BooleanOperationsUtils
-            .ExecuteBooleanOperation( solidOpening, 
+            .ExecuteBooleanOperation( solidOpening,
               solidHost, BooleanOperationsType.Intersect );
         }
 
@@ -121,12 +121,12 @@ namespace SpatialElementGeometryCalculator
           using( Transaction t = new Transaction( doc ) )
           {
             t.Start( "Stacked1" );
-            ShapeCreator.CreateDirectShape( doc, 
+            ShapeCreator.CreateDirectShape( doc,
               intersectSolid, "stackedOpening" );
             t.Commit();
           }
         }
-        return solHandler.GetLargestFaceArea( 
+        return solHandler.GetLargestFaceArea(
           intersectSolid );
       }
     }
@@ -159,7 +159,7 @@ namespace SpatialElementGeometryCalculator
     //  return width.AsDouble() * height.AsDouble();
     //}
 
-    static Solid GetLargestSolid( 
+    static Solid GetLargestSolid(
       GeometryElement geomElem )
     {
       // Not correct if the wall is very thick or 
