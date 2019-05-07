@@ -16,9 +16,15 @@ namespace SpatialElementGeometryCalculator
 
       AddInId addInId = doc.Application.ActiveAddInId;
 
-      DirectShape ds
-        = DirectShape.CreateElement( doc, catId,
-          addInId.GetGUID().ToString(), "" );
+      //DirectShape ds
+      //  = DirectShape.CreateElement( doc, catId,
+      //    addInId.GetGUID().ToString(), "" ); // 2016
+
+      DirectShape ds = DirectShape.CreateElement( 
+        doc, catId ); // 2020
+
+      ds.ApplicationId = addInId.GetGUID().ToString(); // 2020
+      ds.ApplicationDataId = ""; // 2020
 
       if( ds.IsValidGeometry( transientSolid ) )
       {
@@ -84,10 +90,18 @@ namespace SpatialElementGeometryCalculator
 
       builder.CloseConnectedFaceSet();
 
-      return builder.Build( 
-        TessellatedShapeBuilderTarget.Solid, 
-        TessellatedShapeBuilderFallback.Abort, 
-        idGraphicsStyle );
+      //return builder.Build( 
+      //  TessellatedShapeBuilderTarget.Solid, 
+      //  TessellatedShapeBuilderFallback.Abort, 
+      //  idGraphicsStyle ); // 2016
+
+      builder.Fallback = TessellatedShapeBuilderFallback.Abort;
+      builder.Target = TessellatedShapeBuilderTarget.Solid;
+      builder.GraphicsStyleId = idGraphicsStyle;
+
+      builder.Build(); // 2020
+
+      return builder.GetBuildResult();
     }
   }
 }

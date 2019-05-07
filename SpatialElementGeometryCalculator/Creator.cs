@@ -146,7 +146,8 @@ namespace SpatialElementGeometryCalculator
       //  = doc.Application.Create;
 
       //Plane plane = creApp.NewPlane( norm, p ); // 2014
-      Plane plane = new Plane( norm, p ); // 2015
+      //Plane plane = new Plane( norm, p ); // 2015-2016
+      Plane plane = Plane.CreateByNormalAndOrigin( norm, p ); // 2020
 
       //SketchPlane sketchPlane = creDoc.NewSketchPlane( plane ); // 2013
       SketchPlane sketchPlane = SketchPlane.Create( doc, plane ); // 2014
@@ -193,7 +194,8 @@ namespace SpatialElementGeometryCalculator
       {
         norm = XYZ.BasisZ;
       }
-      Plane plane = _creapp.NewPlane( norm, p );
+      //Plane plane = _creapp.NewPlane( norm, p ); // 2016
+      Plane plane = Plane.CreateByNormalAndOrigin( norm, p ); // 2020
 
       //return _credoc.NewSketchPlane( plane ); // 2013
 
@@ -228,22 +230,25 @@ namespace SpatialElementGeometryCalculator
     {
       XYZ p = curve.GetEndPoint( 0 );
       XYZ normal = GetCurveNormal( curve );
-      Plane plane = _creapp.NewPlane( normal, p );
+      //Plane plane = _creapp.NewPlane( normal, p ); // 2016
+      Plane plane = Plane.CreateByNormalAndOrigin( normal, p ); // 2020
 
-#if DEBUG
-      if( !( curve is Line ) )
-      {
-        CurveArray a = _creapp.NewCurveArray();
-        a.Append( curve );
-        Plane plane2 = _creapp.NewPlane( a );
+//#if DEBUG
+//      if( !( curve is Line ) )
+//      {
+//        CurveArray a = _creapp.NewCurveArray();
+//        a.Append( curve );
+//
+//        //Plane plane2 = _creapp.NewPlane( a ); // 2016
+//        No replacement for method above in Revit 2020 API
+//
+//        Debug.Assert( Util.IsParallel( plane2.Normal,
+//          plane.Normal ), "expected equal planes" );
 
-        Debug.Assert( Util.IsParallel( plane2.Normal,
-          plane.Normal ), "expected equal planes" );
-
-        Debug.Assert( Util.IsZero( plane2.SignedDistanceTo(
-          plane.Origin ) ), "expected equal planes" );
-      }
-#endif // DEBUG
+//        Debug.Assert( Util.IsZero( plane2.SignedDistanceTo(
+//          plane.Origin ) ), "expected equal planes" );
+//      }
+//#endif // DEBUG
 
       //return _credoc.NewSketchPlane( plane ); // 2013
 
@@ -261,7 +266,8 @@ namespace SpatialElementGeometryCalculator
       XYZ origin,
       XYZ normal )
     {
-      Plane plane = _creapp.NewPlane( normal, origin );
+      //Plane plane = _creapp.NewPlane( normal, origin ); // 2016
+      Plane plane = Plane.CreateByNormalAndOrigin( normal, origin ); // 2020
 
       SketchPlane sketchPlane = SketchPlane.Create(
         _doc, plane );
