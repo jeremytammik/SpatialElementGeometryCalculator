@@ -129,7 +129,7 @@ namespace SpatialElementGeometryCalculator
               spatialData.idMaterial = spatialSubFace
                 .GetBoundingElementFace().MaterialElementId;
               spatialData.dblNetArea = Util.sqFootToSquareM(
-                spatialSubFace.GetSubface().Area );
+                spatialSubFace.GetSubface().Area - openingArea ); 
               spatialData.dblOpeningArea = Util.sqFootToSquareM(
                 openingArea );
 
