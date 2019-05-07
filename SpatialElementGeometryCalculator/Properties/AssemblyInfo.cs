@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration( "" )]
 [assembly: AssemblyCompany( "Autodesk Inc." )]
 [assembly: AssemblyProduct( "SpatialElementGeometryCalculator" )]
-[assembly: AssemblyCopyright( "Copyright 2015-2016 (C) Phillip Miller, Kiwi Codes Solutions Ltd., Jeremy Tammik, Autodesk Inc., Hakon Clausen, Håvard Dagsvik" )]
+[assembly: AssemblyCopyright( "Copyright 2015-2019 (C) Phillip Miller, Kiwi Codes Solutions Ltd., Jeremy Tammik, Autodesk Inc., Hakon Clausen, Håvard Dagsvik" )]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
 
@@ -42,6 +42,7 @@ using System.Runtime.InteropServices;
 // 2016-04-08 2016.0.0.1 integrated added OpeningHandler.cs by Håvard Dagsvik
 // 2016-04-08 2016.0.0.2 cleanup but not yet tested
 // 2016-04-13 2016.0.0.3 integrated and executed testing code by Håvard Dagsvik
+// 2019-05-07 2020.0.0.0 flat migration to Revit 2020
 //
-[assembly: AssemblyVersion( "2016.0.0.3" )]
-[assembly: AssemblyFileVersion( "2016.0.0.3" )]
+[assembly: AssemblyVersion( "2020.0.0.0" )]
+[assembly: AssemblyFileVersion( "2020.0.0.0" )]
