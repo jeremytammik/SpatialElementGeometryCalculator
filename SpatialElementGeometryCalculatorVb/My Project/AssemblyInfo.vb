@@ -11,14 +11,14 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyTitle("SpatialElementGeometryCalculator")> 
 <Assembly: AssemblyDescription("")> 
 <Assembly: AssemblyCompany("")> 
-<Assembly: AssemblyProduct("SpatialElementGeometryCalculator")> 
-<Assembly: AssemblyCopyright("Copyright ©  2015")> 
+<Assembly: AssemblyProduct("SpatialElementGeometryCalculator")>
+<Assembly: AssemblyCopyright("Copyright © Jeremy Tammik  2015-2019")>
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>
 
 'The following GUID is for the ID of the typelib if this project is exposed to COM
-<Assembly: Guid("9e2863f7-5a97-4408-8b6b-19e3cf8641c0")> 
+<Assembly: Guid("9e2863f7-5a97-4408-8b6b-19e3cf8641c0")>
 
 ' Version information for an assembly consists of the following four values:
 '
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("1.0.0.0")> 
-<Assembly: AssemblyFileVersion("1.0.0.0")> 
+<Assembly: AssemblyVersion("2020.0.0.0")>
+<Assembly: AssemblyFileVersion("2020.0.0.0")>
