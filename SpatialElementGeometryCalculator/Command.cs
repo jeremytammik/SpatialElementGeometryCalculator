@@ -279,5 +279,19 @@ namespace SpatialElementGeometryCalculator
 
       return sortedCache.ToList();
     }
+
+    /// <summary>
+    /// Return wall openings using GetDependentElements
+    /// </summary>
+    static IList<ElementId> GetOpenings( Wall wall )
+    {
+      ElementMulticategoryFilter emcf
+        = new ElementMulticategoryFilter(
+          new List<ElementId>() {
+            new ElementId(BuiltInCategory.OST_Windows),
+            new ElementId(BuiltInCategory.OST_Doors) } );
+
+      return wall.GetDependentElements( emcf );
+    }
   }
 }

@@ -45,6 +45,7 @@ using System.Runtime.InteropServices;
 // 2019-05-07 2020.0.0.0 flat migration to Revit 2020
 // 2019-05-07 2020.0.0.1 fixed architecture mismatch warning
 // 2019-05-07 2020.0.0.2 applied fix to subtract opening area suggested by dan in comment https://thebuildingcoder.typepad.com/blog/2016/04/determining-wall-opening-areas-per-room.html#comment-4452689539
+// 2019-05-08 2020.0.0.3 added GetOpenings as suggested by Håvard in comment https://thebuildingcoder.typepad.com/blog/2016/04/determining-wall-opening-areas-per-room.html#comment-4454441990
 //
-[assembly: AssemblyVersion( "2020.0.0.2" )]
-[assembly: AssemblyFileVersion( "2020.0.0.2" )]
+[assembly: AssemblyVersion( "2020.0.0.3" )]
+[assembly: AssemblyFileVersion( "2020.0.0.3" )]
