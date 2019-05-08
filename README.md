@@ -13,6 +13,8 @@ For a detailed desciption, please refer to the original Revit API discussion thr
 - [IFCExportUtils Determine Door and Window Area](http://thebuildingcoder.typepad.com/blog/2015/03/ifcexportutils-methods-determine-door-and-window-area.html)
 - [Bug Fix &ndash; do not delete while iterating](http://thebuildingcoder.typepad.com/blog/2015/12/au-ioc-banks-and-not-to-delete-while-iterating.html#2)
 - [Migration to Revit 2016](http://thebuildingcoder.typepad.com/blog/2015/12/au-ioc-banks-and-not-to-delete-while-iterating.html#3)
+- [Migration to Revit 2020](https://thebuildingcoder.typepad.com/blog/2019/05/spatial-geometry-add-in-manager-and-show-reels.html#4)
+- [Better approach using `GetDependentElements` and demolished](https://thebuildingcoder.typepad.com/blog/2019/05/spatial-geometry-add-in-manager-and-show-reels.html#4.1)
 
 ## Authors
 
@@ -20,7 +22,8 @@ For a detailed desciption, please refer to the original Revit API discussion thr
 - Jeremy Tammik, [The Building Coder](http://thebuildingcoder.typepad.com), [ADN](http://www.autodesk.com/adn) [Open](http://www.autodesk.com/adnopen), [Autodesk Inc.](http://www.autodesk.com)
 - Vilo
 - [Håkon Clausen](http://hclausen.net)
-- [Håvard Dagsvik ](https://symetri.no)
+- [Håvard Dagsvik](https://symetri.no)
+- [Håvard Leding](https://symetri.no)
 
 ## License
 
