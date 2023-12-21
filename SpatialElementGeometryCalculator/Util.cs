@@ -753,6 +753,7 @@ namespace SpatialElementGeometryCalculator
         + PointArrayString( curve.Tessellate() );
     }
 
+        /*
     /// <summary>
     /// Convert a UnitSymbolType enumeration value
     /// to a brief human readable abbreviation string.
@@ -771,7 +772,7 @@ namespace SpatialElementGeometryCalculator
         .ToLower();
 
       return s;
-    }
+    }*/
     #endregion // Formatting
 
     #region Display a message
@@ -844,7 +845,7 @@ namespace SpatialElementGeometryCalculator
 
       return string.Format( "{0} {1}{2}{3}<{4} {5}>",
         typeName, categoryName, familyName,
-        symbolName, e.Id.IntegerValue, e.Name );
+        symbolName, e.Id.Value, e.Name );
     }
     #endregion // Display a message
 
@@ -1262,13 +1263,14 @@ namespace SpatialElementGeometryCalculator
       ca.ConnectTo( cb );
       //cb.ConnectTo( ca );
     }
-    #endregion // MEP utilities
+        #endregion // MEP utilities
 
-    #region Compatibility fix for spelling error change
-    /// <summary>
-    /// Wrapper to fix a spelling error prior to Revit 2016.
-    /// </summary>
-    public class SpellingErrorCorrector
+#if UNUSED_STUFF
+        #region Compatibility fix for spelling error change
+        /// <summary>
+        /// Wrapper to fix a spelling error prior to Revit 2016.
+        /// </summary>
+        public class SpellingErrorCorrector
     {
       static bool _in_revit_2015_or_earlier;
       static Type _external_definition_creation_options_type;
@@ -1321,6 +1323,7 @@ namespace SpatialElementGeometryCalculator
       }
     }
     #endregion // Compatibility fix for spelling error change
+#endif // UNUSED_STUFF
   }
 
   #region Extension Method Classes
@@ -1520,10 +1523,11 @@ namespace SpatialElementGeometryCalculator
 
       return value;
     }
-    #endregion // Autodesk.Revit.DB.Curve
+        #endregion // Autodesk.Revit.DB.Curve
 
-    #region Autodesk.Revit.DB.Definitions
-    public static Definition Create2(
+#if UNUSED_STUFF
+        #region Autodesk.Revit.DB.Definitions
+        public static Definition Create2(
       this Definitions definitions,
       Document doc,
       string nome,
@@ -1562,10 +1566,11 @@ namespace SpatialElementGeometryCalculator
       }
       return value;
     }
-    #endregion // Autodesk.Revit.DB.Definitions
+        #endregion // Autodesk.Revit.DB.Definitions
+#endif
 
-    #region Autodesk.Revit.DB.Document
-    public static Element GetElement2(
+        #region Autodesk.Revit.DB.Document
+        public static Element GetElement2(
       this Document doc,
       ElementId id )
     {
